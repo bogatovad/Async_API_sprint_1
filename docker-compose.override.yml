@@ -1,0 +1,8 @@
+version: '3'
+services:
+  redis:
+    ports:
+     - "${REDIS_PORT}:${REDIS_PORT}"
+  elastic:
+    ports:
+      - "${ELASTIC_PORT}:${ELASTIC_PORT}"
