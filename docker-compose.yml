@@ -10,8 +10,6 @@ services:
     image: redis:7-alpine
     env_file:
         - .env
-    ports:
-        - ${REDIS_PORT}:${REDIS_PORT}
   elastic:
     image: elasticsearch:7.9.1
     env_file:
