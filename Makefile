@@ -25,3 +25,6 @@ flake8:
 
 isort:
 	${BASE_COMMAND} fasttapi isort ./
+
+fastapi-bash:
+	${BASE_COMMAND} fastapi /bin/bash
