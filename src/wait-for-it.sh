@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Use this script to test if a given TCP host/port are available
+# Don't forget to run `chmod +x wait-for-it.sh'
 
 WAITFORIT_cmdname=${0##*/}
 

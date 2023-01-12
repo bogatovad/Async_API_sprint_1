@@ -1,8 +1,8 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
+from fastapi import APIRouter, Depends, HTTPException
 from services.film import FilmService, get_film_service
 
 # Объект router, в котором регистрируем обработчики
