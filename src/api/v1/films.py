@@ -5,12 +5,11 @@ from pydantic import BaseModel
 from fastapi import APIRouter, Depends, HTTPException
 from services.film import FilmService, get_film_service
 
-# Объект router, в котором регистрируем обработчики
 router = APIRouter()
 
 
-# Модель ответа API
 class Film(BaseModel):
+    """Модель ответа API"""
     id: str
     title: str
 
@@ -20,4 +19,5 @@ async def film_details(film_id: str, film_service: FilmService = Depends(get_fil
     film = await film_service.get_by_id(film_id)
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
+
     return Film(id=film.id, title=film.title)
