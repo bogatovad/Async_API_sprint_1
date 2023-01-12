@@ -22,8 +22,8 @@ ELASTIC_HOST = env('ELASTIC_HOST', '127.0.0.1')
 ELASTIC_PORT = env('ELASTIC_PORT', 9200)
 
 # Настройки сервера
-SERVER_HOST = env("SERVER_HOST", "127.0.0.1")
-SERVER_PORT = env("SERVER_PORT", 8000)
+FASTAPI_HOST = env("FASTAPI_HOST", "127.0.0.1")
+FASTAPI_PORT = env("FASTAPI_PORT", 8000)
 
 # Корень проекта
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

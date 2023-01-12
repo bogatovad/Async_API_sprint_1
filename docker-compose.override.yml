@@ -6,3 +6,6 @@ services:
   elastic:
     ports:
       - "${ELASTIC_PORT}:${ELASTIC_PORT}"
+  fastapi:
+    ports:
+      - "${FASTAPI_PORT}:${FASTAPI_PORT}"

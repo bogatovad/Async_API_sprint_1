@@ -39,8 +39,8 @@ app.include_router(films.router, prefix='/api/v1/films', tags=['films'])
 if __name__ == '__main__':
     uvicorn.run(
         'main:app',
-        host=config.SERVER_HOST,
-        port=config.SERVER_PORT,
+        host=config.FASTAPI_HOST,
+        port=config.FASTAPI_PORT,
         log_config=LOGGING,
         log_level=logging.DEBUG,
     )
