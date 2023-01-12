@@ -6,6 +6,8 @@ services:
       - .env
     depends_on:
       - redis
+    volumes:
+      - ./src:/fastapi
   redis:
     image: redis:7-alpine
     env_file:
