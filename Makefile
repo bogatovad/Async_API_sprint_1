@@ -24,7 +24,7 @@ flake8:
 	${BASE_COMMAND} fastapi flake8
 
 isort:
-	${BASE_COMMAND} fasttapi isort ./
+	${BASE_COMMAND} fastapi isort ./
 
 fastapi-bash:
 	${BASE_COMMAND} fastapi /bin/bash
