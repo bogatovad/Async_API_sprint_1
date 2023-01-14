@@ -7,7 +7,7 @@ from elasticsearch import AsyncElasticsearch, NotFoundError
 from db.elastic import get_elastic
 from db.redis import get_redis
 from fastapi import Depends
-from models.film import Film
+from models.services.film import Film
 
 FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5  # 5 минут
 
