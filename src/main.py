@@ -3,13 +3,13 @@ import logging
 import aioredis
 import uvicorn
 from elasticsearch import AsyncElasticsearch
-from fastapi import FastAPI
-from fastapi.responses import ORJSONResponse
 
 from api.v1 import films
 from core import config
 from core.logger import LOGGING
 from db import elastic, redis
+from fastapi import FastAPI
+from fastapi.responses import ORJSONResponse
 
 app = FastAPI(
     title=config.PROJECT_NAME,
@@ -37,6 +37,8 @@ app.include_router(films.router, prefix='/api/v1/films', tags=['films'])
 if __name__ == '__main__':
     uvicorn.run(
         'main:app',
-        host='0.0.0.0',
-        port=8000,
+        host=config.FASTAPI_HOST,
+        port=config.FASTAPI_PORT,
+        log_config=LOGGING,
+        log_level=logging.DEBUG,
     )
