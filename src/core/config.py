@@ -2,7 +2,7 @@ import os
 from logging import config as logging_config
 
 from environs import Env
-from core.logger import LOGGING
+from .logger import LOGGING
 
 env = Env()
 env.read_env()

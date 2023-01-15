@@ -1,0 +1,20 @@
+version: '3'
+services:
+  fastapi:
+    build: src
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    volumes:
+      - ./src:/fastapi
+  redis:
+    image: redis:7-alpine
+    env_file:
+        - .env
+  elastic:
+    image: elasticsearch:7.9.1
+    env_file:
+      - .env
+    environment:
+      - discovery.type=single-node
