@@ -1,20 +1,42 @@
 version: '3'
 services:
-  fastapi:
-    build: src
-    env_file:
-      - .env
-    depends_on:
-      - redis
-    volumes:
-      - ./src:/fastapi
-  redis:
-    image: redis:7-alpine
-    env_file:
-        - .env
-  elastic:
-    image: elasticsearch:7.9.1
-    env_file:
-      - .env
-    environment:
-      - discovery.type=single-node
+    etl:
+      image: bogatovartemz/etl:0.0.1
+      command: python3 main.py
+      depends_on:
+        - "postgres"
+        - "elasticsearch"
+
+    fastapi:
+      build: src
+      depends_on:
+        - redis
+      volumes:
+        - ./src:/fastapi
+      ports:
+        - 8000:8000
+
+    redis:
+      image: redis:7-alpine
+
+    postgres:
+      image: postgres:13.0-alpine
+      volumes:
+        - data_postgres:/var/lib/postgresql/data/
+      expose:
+        - 5432
+      env_file:
+        - enviroments/.env
+
+    elasticsearch:
+      image: elasticsearch:8.5.3
+      volumes:
+        - data_elasticsearch:/usr/share/elasticsearch/data
+      expose:
+        - 9200
+      env_file:
+        - enviroments/.env_elastic
+
+volumes:
+  data_postgres:
+  data_elasticsearch:
