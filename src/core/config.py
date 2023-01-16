@@ -8,23 +8,17 @@ from core.logger import LOGGING
 env = Env()
 env.read_env()
 
-# Применяем настройки логирования
 logging_config.dictConfig(LOGGING)
 
-# Название проекта. Используется в Swagger-документации
 PROJECT_NAME = env('PROJECT_NAME', 'movies')
 
-# Настройки Redis
-REDIS_HOST = env('REDIS_HOST', '127.0.0.1')
+REDIS_HOST = env('REDIS_HOST', 'redis')
 REDIS_PORT = env('REDIS_PORT', 6379)
 
-# Настройки Elasticsearch
-ELASTIC_HOST = env('ELASTIC_HOST', '127.0.0.1')
+ELASTIC_HOST = env('ELASTIC_HOST', 'elasticsearch')
 ELASTIC_PORT = env('ELASTIC_PORT', 9200)
 
-# Настройки сервера
-FASTAPI_HOST = env("FASTAPI_HOST", "127.0.0.1")
+FASTAPI_HOST = env("FASTAPI_HOST", "0.0.0.0")
 FASTAPI_PORT = env("FASTAPI_PORT", 8000)
 
-# Корень проекта
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

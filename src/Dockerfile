@@ -14,4 +14,4 @@ RUN chown fastapi:fastapi -R /fastapi
 RUN chmod +x ./wait-for-it.sh
 
 USER fastapi
-CMD ./wait-for-it.sh ${REDIS_HOST}:${REDIS_PORT} && python3 main.py
+CMD python3 main.py
