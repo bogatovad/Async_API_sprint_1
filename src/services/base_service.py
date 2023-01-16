@@ -13,7 +13,7 @@ class BaseService:
         self.index = index
         self.model = model
 
-    async def get_by_id(self, id: str) -> BaseModel | None:
+    async def get_by_id(self, id: str):
         item = await self._get_from_cache(id)
         if not item:
             item = await self._get_from_elastic(id)
@@ -23,14 +23,16 @@ class BaseService:
 
         return item
 
-    async def _get_from_elastic(self, id: str) -> BaseModel | None:
+    async def _get_from_elastic(self, id: str):
         try:
             doc = await self.elastic.get(self.index, id)
         except NotFoundError:
             return None
+        print(doc['_source'])
+        print(self.model)
         return self.model(**doc['_source'])
 
-    async def _get_from_cache(self, id: str) -> BaseModel | None:
+    async def _get_from_cache(self, id: str):
         data = await self.redis.get(id)
         if not data:
             return None
@@ -38,7 +40,7 @@ class BaseService:
         item = self.model.parse_raw(data)
         return item
 
-    async def _put_to_cache(self, model: BaseModel):
+    async def _put_to_cache(self, model):
         await self.redis.set(model.id, model.json(), expire=FILM_CACHE_EXPIRE_IN_SECONDS)
 
 

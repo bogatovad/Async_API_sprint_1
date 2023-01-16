@@ -1,4 +1,5 @@
 from __future__ import annotations
+from pydantic import BaseModel
 
 from models.mixins import ORJSONBaseModel, UUIDMixin
 from models.services.genre import Genre
