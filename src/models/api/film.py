@@ -1,4 +1,5 @@
 from typing import List
+
 from models.api.genre import Genre
 from models.api.person import Person
 from models.mixins import ORJSONBaseModel, UUIDMixin
