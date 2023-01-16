@@ -21,3 +21,8 @@ async def film_details(film_id: str, film_service: FilmService = Depends(get_fil
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
 
     return Film(id=film.id, title=film.title)
+
+
+@router.get('/films', response_model=list[Film])
+async def films_main(params: str, film_service: FilmService = Depends(get_film_service)) -> list[Film]:
+    films_list = await fiim_service.get_request(params)
