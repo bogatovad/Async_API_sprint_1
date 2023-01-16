@@ -41,4 +41,5 @@ if __name__ == '__main__':
         port=config.FASTAPI_PORT,
         log_config=LOGGING,
         log_level=logging.DEBUG,
+        reload=True
     )
