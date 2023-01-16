@@ -15,17 +15,8 @@ class FilmService(BaseService):
     pass
 
 
-    async def get_by_params(self, params):
-        films_list = await self._get_from_cache()
-        if not films_list:
-            films_list = await self._get_films_from_elastic()
-
-    async def _get_films_from_elastic(self, film_id: str) -> Optional[Film]:
-        films_list = await self.elastic.search(
-            index="documents",
-            body={"query": {"match_all": {}}},
-            size=20,
-        )
+    async def get_films_alike(self, params):
+        pass
 
 
 @lru_cache()

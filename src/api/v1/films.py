@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 from models.api.film import Film
@@ -18,6 +19,6 @@ async def film_details(film_id: str, film_service: FilmService = Depends(get_fil
         title=film.title)
 
 
-@router.get('/films', response_model=list[Film])
-async def films_main(params: str, film_service: FilmService = Depends(get_film_service)) -> list[Film]:
-    films_list = await film_service.get_request(params)
+@router.get('/', response_model=List[Film])
+async def films_main(film_service: FilmService = Depends(get_film_service)):
+    films_list = await film_service.get_list()
