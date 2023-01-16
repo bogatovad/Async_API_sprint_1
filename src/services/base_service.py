@@ -23,13 +23,24 @@ class BaseService:
 
         return item
 
+    async def get_list(self):
+        try:
+            docs = await self.elastic.search(
+                index=self.index,
+                body={"query": {"match_all": {}}},
+                size=50
+            )
+            items = docs['hits']['hits']
+            schema = [self.model(**doc['_source']) for doc in items]
+        except NotFoundError:
+            return None
+        return schema
+
     async def _get_from_elastic(self, id: str):
         try:
             doc = await self.elastic.get(self.index, id)
         except NotFoundError:
             return None
-        print(doc['_source'])
-        print(self.model)
         return self.model(**doc['_source'])
 
     async def _get_from_cache(self, id: str):
@@ -43,6 +54,3 @@ class BaseService:
     async def _put_to_cache(self, model):
         await self.redis.set(model.id, model.json(), expire=FILM_CACHE_EXPIRE_IN_SECONDS)
 
-
-    async def _get_films_from_cache(self):
-        pass
