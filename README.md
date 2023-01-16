@@ -1,5 +1,5 @@
 ## Запуск
-Создать и заполнить .env из .env.example в папке `Async_API_sprint_1`.  
+Создать и заполнить .env из .env.example в папке `Async_API_sprint_1/enviroments`.  
 Из этой же папки выполнить:
 ```
 make build
