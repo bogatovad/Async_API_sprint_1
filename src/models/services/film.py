@@ -1,15 +1,14 @@
-from __future__ import annotations
-
-from models.mixins import ORJSONBaseModel, UUIDMixin
-from models.services.genre import Genre
 from models.services.person import Person
+from pydantic import Field, BaseModel
+from typing import List, Optional
 
 
-class Film(UUIDMixin, ORJSONBaseModel):
-    title: str
-    imdb_rating: float
-    description: str = ''
-    genre: list[Genre] = []
-    actors: list[Person] = []
-    writers: list[Person] = []
-    directors: list[Person] = []
+class Film(BaseModel):
+    id: str
+    title: Optional[str]
+    imdb_rating: Optional[float]
+    description: Optional[str]
+    genre: Optional[List[str]] = Field(default=[])
+    actors: Optional[List[Person]] = Field(default=[])
+    writers: Optional[List[Person]] = Field(default=[])
+    director: Optional[List[str]] = Field(default=[])

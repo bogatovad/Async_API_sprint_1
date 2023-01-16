@@ -15,4 +15,4 @@ class ORJSONBaseModel(BaseModel):
 
 
 class UUIDMixin(BaseModel):
-    uuid: str = Field(alias='id')
+    id: str
