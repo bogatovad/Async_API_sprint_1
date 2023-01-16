@@ -1,5 +1,4 @@
-from __future__ import annotations
-
+from typing import List
 from models.mixins import ORJSONBaseModel, UUIDMixin
 
 
@@ -12,4 +11,4 @@ class PersonDescription(Person):
     Для ручки /api/v1/persons/<uuid:UUID>/
     """
     role: str
-    film_ids: list[str]
+    film_ids: List[str]

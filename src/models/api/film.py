@@ -1,5 +1,4 @@
-from __future__ import annotations
-
+from typing import List
 from models.api.genre import Genre
 from models.api.person import Person
 from models.mixins import ORJSONBaseModel, UUIDMixin
@@ -16,7 +15,7 @@ class FilmDescription(Film):
     Для ручки /api/v1/films/<uuid:UUID>/
     """
     description: str
-    genre: list[Genre]
-    actors: list[Person]
-    writers: list[Person]
-    directors: list[Person]
+    genre: List[Genre]
+    actors: List[Person]
+    writers: List[Person]
+    directors: List[Person]
