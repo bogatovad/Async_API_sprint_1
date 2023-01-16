@@ -1,5 +1,5 @@
 import orjson
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 def orjson_dumps(v, *, default):
@@ -14,7 +14,5 @@ class ORJSONBaseModel(BaseModel):
         json_dumps = orjson_dumps
 
 
-class Film(ORJSONBaseModel):
-    id: str
-    title: str
-    description: str
+class UUIDMixin(BaseModel):
+    uuid: str = Field(alias='id')
