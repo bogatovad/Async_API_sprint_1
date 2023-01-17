@@ -1,7 +1,8 @@
-from models.services.person import Person
 from pydantic import Field, BaseModel
 from typing import List, Optional
 
+from .person import Person
+from .genre import Genre
 
 class Film(BaseModel):
     id: str

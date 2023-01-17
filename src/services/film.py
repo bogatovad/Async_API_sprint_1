@@ -14,9 +14,17 @@ from .base_service import BaseService
 class FilmService(BaseService):
     pass
 
-
-    async def get_films_alike(self, params):
-        pass
+    async def get_all_films(self, query_params):
+        query_params = {
+            "query": {
+            "match_all": {}
+            }
+        }
+        doc = await self.elastic.search(
+            index=self.index,
+            body=query_params
+        )
+        return doc
 
 
 @lru_cache()
