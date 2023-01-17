@@ -1,5 +1,5 @@
-from models.mixins import ORJSONBaseModel, UUIDMixin
+from models.mixins import IDMixin, ORJSONBaseModel
 
 
-class Person(UUIDMixin, ORJSONBaseModel):
+class Person(IDMixin, ORJSONBaseModel):
     full_name: str
