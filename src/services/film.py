@@ -12,21 +12,27 @@ from .base_service import BaseService
 
 
 class FilmService(BaseService):
-    pass
 
-    async def get_all_films(self, query_params=None):
-        body = {
-            "query": {
-            "match_all": {}
+    async def get_body_search(self, q: str, field: list):
+        return {'query': {
+            'multi_match': {
+                'query': f'{q}',
+                'fields': field
             }
+        }}
+
+    async def get_all_films(self, query_params):
+        body = {
+            'query': {'match_all': {}},
+            'sort': {"imdb_rating": "desc"}
         }
-        sort = f'{query_params.get("sort")}:desc' if query_params else None
+
         doc = await self.elastic.search(
             index=self.index,
-            body=body,
-            sort=sort
+            body=body
         )
         return doc
+
 
 
 
