@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from models.api.film import Film, FilmDescription
 from services.film import FilmService, get_film_service
 
-
 router = APIRouter()
 MOCK_PERSON = {'id': '123', 'full_name': 'full_name'}
 MOCK_GENRE = {'id': '1', 'name': 'genre'}

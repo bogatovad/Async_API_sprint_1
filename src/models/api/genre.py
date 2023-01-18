@@ -1,6 +1,5 @@
-from pydantic import BaseModel, Field
+from models.mixins import IDMixin, ORJSONBaseModel
 
 
-class Genre(BaseModel):
-    id: str
+class Genre(IDMixin, ORJSONBaseModel):
     name: str
