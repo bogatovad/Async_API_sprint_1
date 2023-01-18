@@ -7,9 +7,13 @@ from elasticsearch import AsyncElasticsearch, NotFoundError
 from db.elastic import get_elastic
 from db.redis import get_redis
 from fastapi import Depends
+from models.api.person import PersonFull
 from models.services.film import Film
+from models.services.genre import GenreId
+from .base_service import BaseService
 
 FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5
+
 
 class FilmService(BaseService):
 
@@ -21,7 +25,7 @@ class FilmService(BaseService):
             }
         }}
 
-    async def get_all_films(self, query_params):
+    async def get_all_films(self):
         body = {
             'query': {'match_all': {}},
             'sort': {"imdb_rating": "desc"}
@@ -33,6 +37,21 @@ class FilmService(BaseService):
         )
         return doc
 
+    async def get_search(self, query_params):
+        if query_params:
+            body = await self.get_body_search(field=field, q=q)
+        else:
+            body = await self.get_all_films()
+
+        doc = self.elastic.search(
+            index=self.index,
+            body=body,
+            size=query_params.get('page_size') if query_params else None,
+            from_=query_params.get('page_number') * query_params.get(
+                'page_size') if query_params else None,
+            sort=f'{query_params.get("sort")}: desc'
+        )
+        return await doc
 
 class GenreService:
     def __init__(self, redis: Redis, elastic: AsyncElasticsearch):
@@ -168,3 +187,18 @@ def get_film_service(
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> FilmService:
     return FilmService(redis, elastic)
+
+@lru_cache()
+def get_genre_service(
+        redis: Redis = Depends(get_redis),
+        elastic: AsyncElasticsearch = Depends(get_elastic),
+) -> GenreService:
+    return GenreService(redis, elastic)
+
+
+@lru_cache()
+def get_person_service(
+        redis: Redis = Depends(get_redis),
+        elastic: AsyncElasticsearch = Depends(get_elastic),
+) -> PersonService:
+    return PersonService(redis, elastic)
