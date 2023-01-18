@@ -11,5 +11,5 @@ class PersonDescription(Person):
     """Данные по персоне.
     Для ручки /api/v1/persons/<uuid:UUID>/
     """
-    role: str
+    role: List[str]
     film_ids: List[str]
