@@ -7,9 +7,9 @@ from elasticsearch import AsyncElasticsearch, NotFoundError
 from db.elastic import get_elastic
 from db.redis import get_redis
 from fastapi import Depends
-from models.api.person import PersonDescriptionResponse
 from models.services.film import Film
 from models.services.genre import Genre
+from models.services.person import PersonDescription
 
 FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5
 
@@ -176,7 +176,7 @@ class PersonService:
                 ('actor', count_movies_actor), ('writer', count_movies_writers), ('director', count_movies_director)
             ) if role[1] != 0
         ]
-        return PersonDescriptionResponse(**person['_source'], role=role, film_ids=film_ids)
+        return PersonDescription(**person['_source'], role=role, film_ids=film_ids)
 
 
 @lru_cache()
