@@ -11,19 +11,12 @@ from models.api.person import PersonFull
 from models.services.film import Film
 from models.services.genre import GenreId
 from .base_service import BaseService
+from .utils import es_search_template
 
 FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5
 
 
 class FilmService(BaseService):
-
-    async def get_body_search(self, q: str, field: list):
-        return {'query': {
-            'multi_match': {
-                'query': f'{q}',
-                'fields': field
-            }
-        }}
 
     async def get_all_films(self):
         body = {
@@ -39,19 +32,14 @@ class FilmService(BaseService):
 
     async def get_search(self, query_params):
         if query_params:
-            body = await self.get_body_search(field=field, q=q)
+            body = es_search_template(query_params)
         else:
             body = await self.get_all_films()
 
-        doc = self.elastic.search(
-            index=self.index,
-            body=body,
-            size=query_params.get('page_size') if query_params else None,
-            from_=query_params.get('page_number') * query_params.get(
-                'page_size') if query_params else None,
-            sort=f'{query_params.get("sort")}: desc'
-        )
-        return await doc
+        doc = await self.elastic.search(index=self.index, body=body)
+
+        return doc
+
 
 class GenreService:
     def __init__(self, redis: Redis, elastic: AsyncElasticsearch):
@@ -186,7 +174,7 @@ def get_film_service(
         redis: Redis = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> FilmService:
-    return FilmService(redis, elastic)
+    return FilmService(redis, elastic, 'movies', Film)
 
 @lru_cache()
 def get_genre_service(
