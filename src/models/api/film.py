@@ -16,7 +16,7 @@ class FilmDescription(Film):
     Для ручки /api/v1/films/<uuid:UUID>/
     """
     description: str
-    GenreResponse: List[GenreResponse]
+    genre: List[GenreResponse]
     actors: List[Person]
     writers: List[Person]
     directors: List[Person]
