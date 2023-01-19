@@ -18,7 +18,7 @@ router = APIRouter()
 async def search_persons(
         query: str,
         page: int = Query(1, description='Номер страницы'),
-        size: int = Query(10, description='Количество фильмов на странице'),
+        size: int = Query(10, description='Количество персон на странице'),
         person_service: PersonService = Depends(get_person_service)
 ) -> List[PersonDescriptionResponse]:
     persons = await person_service.search_persons(query, page, size)
