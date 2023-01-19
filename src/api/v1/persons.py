@@ -3,7 +3,7 @@ from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 from models.api.film import FilmResponse
-from models.api.person import PersonDescription
+from models.api.person import PersonDescriptionResponse
 from services.film import PersonService, get_person_service
 
 router = APIRouter()
@@ -11,13 +11,13 @@ router = APIRouter()
 
 @router.get(
     '/search',
-    response_model=List[PersonDescription],
+    response_model=List[PersonDescriptionResponse],
     description='Поиск по персоне',
     response_description='Результат поиска'
 )
 async def search_persons(
         query: str, page: int, size: int, person_service: PersonService = Depends(get_person_service)
-) -> List[PersonDescription]:
+) -> List[PersonDescriptionResponse]:
     print('QUERY!', query, page)
     persons = await person_service.search_persons(query, page, size)
     if not persons:
@@ -27,13 +27,13 @@ async def search_persons(
 
 @router.get(
     '/{person_id}',
-    response_model=PersonDescription,
+    response_model=PersonDescriptionResponse,
     description='Получить информацию о персоне',
     response_description='Подробная информация о персоне'
 )
 async def person_details(
         person_id: str, person_service: PersonService = Depends(get_person_service)
-) -> PersonDescription:
+) -> PersonDescriptionResponse:
     person = await person_service.get_by_id(person_id)
     if not person:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='person not found')
