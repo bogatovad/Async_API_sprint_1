@@ -2,7 +2,7 @@ from http import HTTPStatus
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
-from models.api.film import Film
+from models.api.film import FilmResponse
 from models.api.person import PersonDescription
 from services.film import PersonService, get_person_service
 
@@ -42,14 +42,14 @@ async def person_details(
 
 @router.get(
     '/{person_id}/film',
-    response_model=List[Film],
+    response_model=List[FilmResponse],
     description='Получить фильмы по персоне.',
     response_description='Фильмы по персоне.'
 
 )
 async def list_film_by_person(
         person_id: str, person_service: PersonService = Depends(get_person_service)
-) -> List[Film]:
+) -> List[FilmResponse]:
     films = await person_service.get_film_by_id(person_id)
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films with person not found')

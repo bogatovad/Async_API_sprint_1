@@ -5,13 +5,13 @@ from models.api.person import Person
 from models.mixins import ORJSONBaseModel, UUIDMixin
 
 
-class Film(UUIDMixin, ORJSONBaseModel):
+class FilmResponse(UUIDMixin, ORJSONBaseModel):
     """Модель ответа API с информацией о фильмах."""
     title: str
     imdb_rating: float
 
 
-class FilmDescription(Film):
+class FilmDescriptionResponse(FilmResponse):
     """Полная информация по фильму.
     Для ручки /api/v1/films/<uuid:UUID>/
     """
