@@ -1,4 +1,3 @@
-# Выбор версии 3.8 обусловлен нормльной установкой для данного образа uvloop и orjson
 FROM python:3.8-slim
 
 RUN pip install --upgrade pip
