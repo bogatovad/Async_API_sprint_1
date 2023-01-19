@@ -77,6 +77,19 @@ class FilmService(Paginator):
         films_schema = [Film(**film['_source']) for film in films]
         return films_schema
 
+    async def get_films_alike(self, film_id: str):
+        film = await self.get_by_id(film_id)
+        genres = film.genre
+        query_params = {
+            "query": {
+                "terms": {
+                    "genre": genres
+                }
+            }
+        }
+        films = await self.elastic.search("movies", query_params)
+        return [Film(**film['_source']) for film in films]
+
 
 @lru_cache()
 def get_film_service(

@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from typing import List, Union
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from models.api.film import FilmDescriptionResponse, FilmResponse
 from services.film import FilmService, get_film_service
 
@@ -38,6 +38,22 @@ async def list_films(
     film_service: FilmService = Depends(get_film_service)
 ) -> List[FilmResponse]:
     films = await film_service.get_all_films(sort, page, size, filter)
+    if not films:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
+    return [FilmResponse(uuid=film.id, title=film.title, imdb_rating=film.imdb_rating) for film in films]
+
+
+@router.get(
+    '/alike/{film_id}',
+    response_model=List[FilmResponse],
+    description='Похожие фильмы',
+    response_description='Список похожих фильмов'
+)
+async def films_alike(
+        film_id: str = Path(None, description='id фильма, для которого ищем похожие'),
+        film_service: FilmService = Depends(get_film_service)
+) -> List[FilmResponse]:
+    films = await film_service.get_films_alike(film_id)
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
     return [FilmResponse(uuid=film.id, title=film.title, imdb_rating=film.imdb_rating) for film in films]
