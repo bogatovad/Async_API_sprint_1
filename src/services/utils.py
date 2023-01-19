@@ -8,7 +8,7 @@ def es_search_template(query_params: dict) -> dict:
     filter_id = None
     filter_path = None
     query = None
-    query_fields = ['title,', 'description']
+    query_fields = ['title,', 'description', 'genre']
 
 
     if query_params.get('sort'):
@@ -18,10 +18,12 @@ def es_search_template(query_params: dict) -> dict:
     if query_params.get('filter[genre]'):
         filter_id = query_params.get('filter[genre]')
         filter_path = 'genre'
-    if query_params.get('filter[person]'):
-        filter_id = query_params.get('filter[person]')
-    if query_params.get('filter[path]'):
-        filter_path = query_params.get('filter[path]')
+    if query_params.get('filter[actors]'):
+        filter_id = query_params.get('filter[actors]')
+        filter_path = 'actors'
+    if query_params.get('filter[writers]'):
+        filter_id = query_params.get('filter[writers]')
+        filter_path = 'writers'
     if query_params.get('query'):
         query = query_params.get('query')
     if query_params.get('fields'):
@@ -31,7 +33,7 @@ def es_search_template(query_params: dict) -> dict:
     filter = {
         'nested': {
             'path': filter_path,
-            'query': {'bool': {'must': [{'match_phrase': {f'{filter_path}.uuid': filter_id}}]}},
+            'query': {'match': {f'{filter_path}.id': filter_id}},
         }
     }
 
