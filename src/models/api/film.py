@@ -1,8 +1,8 @@
-from models.mixins import ORJSONBaseModel, UUIDMixin
 from typing import List
 
 from models.api.genre import GenreResponse
 from models.api.person import PersonResponse
+from models.mixins import ORJSONBaseModel, UUIDMixin
 
 
 class FilmResponse(UUIDMixin, ORJSONBaseModel):

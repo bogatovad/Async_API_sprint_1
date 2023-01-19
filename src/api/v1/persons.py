@@ -25,7 +25,8 @@ async def search_persons(
     if not persons:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films with person not found')
     return [
-        PersonDescriptionResponse(uuid=person.id, role=person.role, film_ids=person.film_ids) for person in persons
+        PersonDescriptionResponse(uuid=person.id, role=person.role, film_ids=person.film_ids, name=person.full_name)
+        for person in persons
     ]
 
 
