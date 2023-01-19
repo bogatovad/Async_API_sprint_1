@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from models.api.film import FilmResponse
 from models.api.person import PersonDescriptionResponse
 from services.person import PersonService, get_person_service
@@ -16,7 +16,10 @@ router = APIRouter()
     response_description='Результат поиска'
 )
 async def search_persons(
-        query: str, page: int, size: int, person_service: PersonService = Depends(get_person_service)
+        query: str,
+        page: int = Query(1, description='Номер страницы'),
+        size: int = Query(10, description='Количество фильмов на странице'),
+        person_service: PersonService = Depends(get_person_service)
 ) -> List[PersonDescriptionResponse]:
     persons = await person_service.search_persons(query, page, size)
     if not persons:
