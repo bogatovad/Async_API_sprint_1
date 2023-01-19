@@ -1,8 +1,8 @@
 from typing import List, Optional
 
+from models.mixins import IDMixin, ORJSONBaseModel
 from pydantic import Field
 
-from models.mixins import IDMixin, ORJSONBaseModel
 from models.services.person import Person
 
 

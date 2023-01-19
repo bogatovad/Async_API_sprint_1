@@ -52,7 +52,8 @@ async def person_details(
 
 )
 async def list_film_by_person(
-        person_id: str, person_service: PersonService = Depends(get_person_service)
+        person_id: str,
+        person_service: PersonService = Depends(get_person_service)
 ) -> List[FilmResponse]:
     films = await person_service.get_film_by_id(person_id)
     if not films:

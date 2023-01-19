@@ -18,3 +18,9 @@ make isort
 
 ## Документация API
 Доступна по адресу `http://{FASTAPI_HOST}:{FASTAPI_PORT}/api/openapi`
+
+## Тестрование
+Для запуска тестов выполнить при запущенном сервисе: 
+```
+make test
+```
