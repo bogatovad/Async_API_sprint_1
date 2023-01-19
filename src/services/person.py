@@ -7,7 +7,7 @@ from db.elastic import get_elastic
 from db.redis import get_redis
 from fastapi import Depends
 from models.api.film import FilmResponse
-from models.services.person import PersonDescription
+from models.services.person import PersonFull
 from services.paginator import Paginator
 
 
@@ -109,7 +109,7 @@ class PersonService(Paginator):
                     ('director', count_movies_director)
                 ) if role[1] != 0
         ]
-        return PersonDescription(**person['_source'], role=role, film_ids=film_ids)
+        return PersonFull(**person['_source'], role=role, film_ids=film_ids)
 
 
 @lru_cache()

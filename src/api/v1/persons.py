@@ -41,7 +41,7 @@ async def person_details(
     person = await person_service.get_by_id(person_id)
     if not person:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='person not found')
-    return PersonDescriptionResponse(uuid=person.id, role=person.role, film_ids=person.film_ids)
+    return PersonDescriptionResponse(uuid=person.id, role=person.role, film_ids=person.film_ids, name=person.full_name)
 
 
 @router.get(
