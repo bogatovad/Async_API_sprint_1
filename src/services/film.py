@@ -7,7 +7,6 @@ from elasticsearch import AsyncElasticsearch, NotFoundError
 from db.elastic import get_elastic
 from db.redis import get_redis
 from fastapi import Depends
-
 from models.services.film import Film
 from models.services.genre import GenreId
 from services.paginator import Paginator

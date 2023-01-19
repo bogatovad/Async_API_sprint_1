@@ -1,4 +1,3 @@
-from __future__ import annotations
 from models.mixins import ORJSONBaseModel, UUIDMixin
 
 

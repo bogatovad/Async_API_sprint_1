@@ -3,6 +3,7 @@ import requests
 
 HOST = 'http://docker.for.mac.localhost:8000'
 
+
 @pytest.mark.parametrize(
     'endpoint', (
         'api/v1/genres/',

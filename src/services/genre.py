@@ -2,10 +2,10 @@ from functools import lru_cache
 
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch, NotFoundError
-from fastapi import Depends
+
 from db.elastic import get_elastic
 from db.redis import get_redis
-
+from fastapi import Depends
 from models.services.genre import GenreId
 
 
