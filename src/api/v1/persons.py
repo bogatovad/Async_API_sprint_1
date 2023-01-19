@@ -2,9 +2,8 @@ from http import HTTPStatus
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
-from models.api.film import Film, FilmResponse
-from models.api.person import PersonDescriptionResponse, PersonFull
-from services.film import PersonService, get_person_service
+from models.api.film import FilmResponse
+from models.api.person import PersonDescriptionResponse
 from services.person import PersonService, get_person_service
 
 router = APIRouter()
@@ -22,7 +21,9 @@ async def search_persons(
     persons = await person_service.search_persons(query, page, size)
     if not persons:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films with person not found')
-    return persons
+    return [
+        PersonDescriptionResponse(uuid=person.id, role=person.role, film_ids=person.film_ids) for person in persons
+    ]
 
 
 @router.get(
@@ -37,7 +38,7 @@ async def person_details(
     person = await person_service.get_by_id(person_id)
     if not person:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='person not found')
-    return person
+    return PersonDescriptionResponse(uuid=person.id, role=person.role, film_ids=person.film_ids)
 
 
 @router.get(
@@ -53,4 +54,4 @@ async def list_film_by_person(
     films = await person_service.get_film_by_id(person_id)
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films with person not found')
-    return films
+    return [FilmResponse(uuid=film.id, title=film.title, imdb_rating=film.imdb_rating) for film in films]
