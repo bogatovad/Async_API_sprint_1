@@ -1,7 +1,6 @@
-from typing import List
+from typing import List, Optional
 
-from models.api.genre import GenreResponse
-from models.api.person import PersonResponse
+from models.api.person import FilmPersonResponse
 from models.mixins import ORJSONBaseModel, UUIDMixin
 
 
@@ -15,8 +14,8 @@ class FilmDescriptionResponse(FilmResponse):
     """Полная информация по фильму.
     Для ручки /api/v1/films/<uuid:UUID>/
     """
-    description: str
-    genre: List[GenreResponse]
-    actors: List[PersonResponse]
-    writers: List[PersonResponse]
-    directors: List[PersonResponse]
+    description: Optional[str]
+    genre: Optional[List[str]]
+    actors: Optional[List[FilmPersonResponse]]
+    writers: Optional[List[FilmPersonResponse]]
+    directors: Optional[List[FilmPersonResponse]]
