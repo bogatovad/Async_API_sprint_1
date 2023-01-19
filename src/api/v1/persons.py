@@ -10,6 +10,8 @@ from typing import List
 router = APIRouter()
 
 
+# todo: возможно тут стоит написать декоратор (или класс), который обобщает логику внутри этих функций.
+
 @router.get('/search', response_model=List[PersonFull])
 async def search_persons(query: str, page: int, size: int, person_service: PersonService = Depends(get_person_service))\
         -> List[PersonFull]:
