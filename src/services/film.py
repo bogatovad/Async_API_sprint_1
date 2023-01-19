@@ -8,7 +8,7 @@ from db.elastic import get_elastic
 from db.redis import get_redis
 from fastapi import Depends
 from models.services.film import Film
-from models.services.genre import GenreId
+from models.services.genre import Genre
 from services.paginator import Paginator
 
 FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5
@@ -55,7 +55,7 @@ class FilmService(Paginator):
 
         if filter:
             genre = await self.elastic.get("genres", filter)
-            genre_schema = GenreId(**genre['_source'])
+            genre_schema = Genre(**genre['_source'])
             query["query"] = {
                 "match": {
                     "genre": genre_schema.name

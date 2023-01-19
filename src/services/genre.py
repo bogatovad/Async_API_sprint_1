@@ -6,7 +6,7 @@ from elasticsearch import AsyncElasticsearch, NotFoundError
 from db.elastic import get_elastic
 from db.redis import get_redis
 from fastapi import Depends
-from models.services.genre import GenreId
+from models.services.genre import Genre
 
 
 class GenreService:
@@ -16,14 +16,14 @@ class GenreService:
 
     async def get_by_id(self, genre_id: str):
         genre = await self.elastic.get("genres", genre_id)
-        genre_schema = GenreId(**genre['_source'])
+        genre_schema = Genre(**genre['_source'])
         return genre_schema
 
     async def get_list(self):
         try:
             docs = await self.elastic.search(index="genres", body={"query": {"match_all": {}}})
             genres = docs['hits']['hits']
-            genres_schema = [GenreId(**genre['_source']) for genre in genres]
+            genres_schema = [Genre(**genre['_source']) for genre in genres]
         except NotFoundError:
             return None
         return genres_schema
