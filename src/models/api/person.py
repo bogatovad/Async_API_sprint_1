@@ -4,7 +4,7 @@ from models.mixins import ORJSONBaseModel, UUIDMixin
 
 
 class PersonResponse(UUIDMixin, ORJSONBaseModel):
-    full_name: str
+    name: str
 
 
 class PersonDescriptionResponse(PersonResponse):

@@ -18,7 +18,10 @@ async def film_details(film_id: str, film_service: FilmService = Depends(get_fil
     film = await film_service.get_by_id(film_id)
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
-    return film
+    return FilmDescriptionResponse(
+        uuid=film.id, title=film.title, imdb_rating=film.imdb_rating, description=film.description,
+        genre=film.genre, actors=film.actors, writers=film.writers, directors=film.director
+    )
 
 
 @router.get(
@@ -37,4 +40,4 @@ async def list_films(
     films = await film_service.get_all_films(sort, page, size, filter)
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
-    return [FilmResponse(uuid=film.id) for film in films]
+    return [FilmResponse(uuid=film.id, title=film.title, imdb_rating=film.imdb_rating) for film in films]
