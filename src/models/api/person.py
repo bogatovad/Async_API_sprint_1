@@ -1,6 +1,8 @@
 from typing import List
-from models.mixins import ORJSONBaseModel, UUIDMixin
+
 from pydantic import Field
+
+from models.mixins import ORJSONBaseModel, UUIDMixin
 
 
 class PersonResponse(UUIDMixin, ORJSONBaseModel):
