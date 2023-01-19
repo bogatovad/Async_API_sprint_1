@@ -2,9 +2,10 @@ from http import HTTPStatus
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
-from models.api.film import FilmResponse
-from models.api.person import PersonDescriptionResponse
+from models.api.film import Film, FilmResponse
+from models.api.person import PersonDescriptionResponse, PersonFull
 from services.film import PersonService, get_person_service
+from services.person import PersonService, get_person_service
 
 router = APIRouter()
 
@@ -18,7 +19,6 @@ router = APIRouter()
 async def search_persons(
         query: str, page: int, size: int, person_service: PersonService = Depends(get_person_service)
 ) -> List[PersonDescriptionResponse]:
-    print('QUERY!', query, page)
     persons = await person_service.search_persons(query, page, size)
     if not persons:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films with person not found')

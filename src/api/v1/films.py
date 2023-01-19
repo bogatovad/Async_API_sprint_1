@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import List
+from typing import List, Union
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from models.api.film import FilmDescriptionResponse, FilmResponse
@@ -27,10 +27,14 @@ async def film_details(film_id: str, film_service: FilmService = Depends(get_fil
     description='Главная страница',
     response_description='Список фильмов на главной странице'
 )
-async def film_list(
-    page_size: int = Query(10, description='Количество фильмов на странице'),
+async def list_films(
     page: int = Query(1, description='Номер страницы'),
+    size: int = Query(10, description='Количество фильмов на странице'),
+    filter: Union[str, None] = None,
+    sort: str = 'imdb_rating',
     film_service: FilmService = Depends(get_film_service)
 ) -> List[FilmResponse]:
-    films_list = await film_service.get_all()
-    return films_list
+    films = await film_service.get_all_films(sort, page, size, filter)
+    if not films:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
+    return [FilmResponse(uuid=film.id) for film in films]
