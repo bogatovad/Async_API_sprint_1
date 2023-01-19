@@ -29,9 +29,6 @@ class FilmService(Paginator):
 
         return film
 
-    async def get_all(self):
-        ...
-
     async def _get_film_from_elastic(self, film_id: str) -> Optional[Film]:
         try:
             doc = await self.elastic.get('movies', film_id)
