@@ -1,6 +1,6 @@
 from typing import List
 
-from models.api.genre import Genre
+from models.api.genre import GenreResponse
 from models.api.person import Person
 from models.mixins import ORJSONBaseModel, UUIDMixin
 
@@ -16,7 +16,7 @@ class FilmDescription(Film):
     Для ручки /api/v1/films/<uuid:UUID>/
     """
     description: str
-    genre: List[Genre]
+    GenreResponse: List[GenreResponse]
     actors: List[Person]
     writers: List[Person]
     directors: List[Person]

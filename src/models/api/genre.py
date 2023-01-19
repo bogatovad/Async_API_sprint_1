@@ -1,5 +1,5 @@
 from models.mixins import ORJSONBaseModel, UUIDMixin
 
 
-class Genre(UUIDMixin, ORJSONBaseModel):
+class GenreResponse(UUIDMixin, ORJSONBaseModel):
     name: str
