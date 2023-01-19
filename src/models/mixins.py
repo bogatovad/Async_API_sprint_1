@@ -16,3 +16,7 @@ class ORJSONBaseModel(BaseModel):
 
 class IDMixin(BaseModel):
     id: str
+
+
+class UUIDMixin(BaseModel):
+    uuid: str

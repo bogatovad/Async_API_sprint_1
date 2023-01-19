@@ -2,10 +2,10 @@ from typing import List
 
 from models.api.genre import Genre
 from models.api.person import Person
-from models.mixins import IDMixin, ORJSONBaseModel
+from models.mixins import ORJSONBaseModel, UUIDMixin
 
 
-class Film(IDMixin, ORJSONBaseModel):
+class Film(UUIDMixin, ORJSONBaseModel):
     """Модель ответа API с информацией о фильмах."""
     title: str
     imdb_rating: float

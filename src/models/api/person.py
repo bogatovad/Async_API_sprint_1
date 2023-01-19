@@ -1,9 +1,9 @@
 from typing import List
 
-from models.mixins import IDMixin, ORJSONBaseModel
+from models.mixins import ORJSONBaseModel, UUIDMixin
 
 
-class Person(IDMixin, ORJSONBaseModel):
+class Person(UUIDMixin, ORJSONBaseModel):
     full_name: str
 
 

@@ -1,5 +1,5 @@
-from models.mixins import IDMixin, ORJSONBaseModel
+from models.mixins import ORJSONBaseModel, UUIDMixin
 
 
-class Genre(IDMixin, ORJSONBaseModel):
+class Genre(UUIDMixin, ORJSONBaseModel):
     name: str
