@@ -18,4 +18,4 @@ class FilmDescriptionResponse(FilmResponse):
     genre: Optional[List[str]]
     actors: Optional[List[FilmPersonResponse]]
     writers: Optional[List[FilmPersonResponse]]
-    directors: Optional[List[FilmPersonResponse]]
+    directors: Optional[List[str]]
