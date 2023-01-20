@@ -28,3 +28,6 @@ isort:
 
 fastapi-bash:
 	${BASE_COMMAND} fastapi /bin/bash
+
+test:
+	${BASE_COMMAND} fastapi pytest tests/

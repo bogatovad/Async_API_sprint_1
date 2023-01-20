@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends, HTTPException
 from models.api.film import Film
 from services.film import FilmService, get_film_service
 
-
 router = APIRouter()
 
 
@@ -34,4 +33,3 @@ async def list_films(page: int, size: int, filter: Union[str, None] = None, sort
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
     return films
-

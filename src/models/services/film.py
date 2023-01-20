@@ -1,6 +1,8 @@
-from models.services.person import Person
-from pydantic import Field, BaseModel
 from typing import List, Optional
+
+from pydantic import BaseModel, Field
+
+from models.services.person import Person
 
 
 class Film(BaseModel):
