@@ -9,6 +9,7 @@ from services.person import PersonService, get_person_service
 router = APIRouter()
 
 
+# todo: возможно тут стоит написать декоратор (или класс), который обобщает логику внутри этих функций.
 @router.get(
     '/search',
     response_model=List[PersonDescriptionResponse],

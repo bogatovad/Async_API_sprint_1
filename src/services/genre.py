@@ -1,4 +1,6 @@
+import pickle
 from functools import lru_cache
+from typing import List, Optional
 
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch, NotFoundError
@@ -8,6 +10,8 @@ from db.redis import get_redis
 from fastapi import Depends
 from models.services.genre import Genre
 
+GENRE_CACHE_EXPIRE_IN_SECONDS = 60 * 5
+
 
 class GenreService:
     def __init__(self, redis: Redis, elastic: AsyncElasticsearch):
@@ -15,18 +19,49 @@ class GenreService:
         self.elastic = elastic
 
     async def get_by_id(self, genre_id: str):
-        genre = await self.elastic.get("genres", genre_id)
-        genre_schema = Genre(**genre['_source'])
-        return genre_schema
+        genre = await self._genre_from_cache(genre_id)
+        if not genre:
+            genre = await self._get_genre_from_elastic(genre_id)
+            if not genre:
+                return []
+            await self._put_genre_to_cache(genre)
+        return genre
 
-    async def get_list(self):
+    async def _get_genre_from_elastic(self, genre_id: str) -> Optional[Genre]:
         try:
-            docs = await self.elastic.search(index="genres", body={"query": {"match_all": {}}})
-            genres = docs['hits']['hits']
-            genres_schema = [Genre(**genre['_source']) for genre in genres]
+            doc = await self.elastic.get('genres', genre_id)
         except NotFoundError:
             return None
-        return genres_schema
+        doc = doc['_source']
+        return Genre(**doc)
+
+    async def _genre_from_cache(self, genre_id: str):
+        data = await self.redis.get(genre_id)
+        if not data:
+            return None
+        genre = Genre.parse_raw(data)
+        return genre
+
+    async def _put_genre_to_cache(self, genre: Genre):
+        await self.redis.set(genre.id, genre.json(), expire=GENRE_CACHE_EXPIRE_IN_SECONDS)
+
+    async def get_list(self):
+        key_list_genres = "list_genres"
+        genres = await self.redis.get(key_list_genres)
+        if genres:
+            return pickle.loads(genres)
+        genres = await self._get_genre_list_from_elastic()
+        if not genres:
+            return []
+        await self.redis.set(key_list_genres, pickle.dumps(genres), expire=GENRE_CACHE_EXPIRE_IN_SECONDS)
+        return genres
+
+    async def _get_genre_list_from_elastic(self) -> Optional[List[Genre]]:
+        try:
+            docs = await self.elastic.search(index="genres", body={"query": {"match_all": {}}})
+        except NotFoundError:
+            return []
+        return [Genre(**genre['_source']) for genre in docs['hits']['hits']]
 
 
 @lru_cache()
