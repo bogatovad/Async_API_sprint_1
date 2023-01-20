@@ -11,6 +11,7 @@ from fastapi import Depends
 from models.services.film import Film
 from models.services.genre import GenreId
 from services.paginator import Paginator
+from services.utils import es_search_template
 
 FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5
 
@@ -50,8 +51,6 @@ class FilmService(Paginator):
 
     async def get_all_films(self, sort: str, page: int, size: int, _filter: Union[str, None]):
         query = {}
-        # todo: фильтрация может быть только по жанру или есть другие варианты?
-        # todo: также стоит разнести логику метода и преобразование к http формату данных.
         if _filter:
             genre = await self.elastic.get("genres", _filter)
             genre_schema = GenreId(**genre['_source'])
@@ -83,6 +82,23 @@ class FilmService(Paginator):
         films_schema = [Film(**film['_source']) for film in films]
         await self.redis.set(key_list_movies, pickle.dumps(films_schema))
         return films_schema
+
+    async def get_search(self, query_params):
+        page, body = es_search_template("movies", query_params)
+
+        print(f'sfdsfdsf {body}')
+        body_copy = body.copy()
+        body_copy["index"] = "movies_search"
+        body_copy["page"] = page
+        key_movies_search = pickle.dumps(body_copy)
+        movies = await self.redis.get(key_movies_search)
+        if movies:
+            loads_movies = pickle.loads(movies)
+        else:
+            loads_movies = await self.paginator("movies", body, page)
+            await self.redis.set(key_movies_search, pickle.dumps(loads_movies),
+                                 expire=FILM_CACHE_EXPIRE_IN_SECONDS)
+        return [Film(**movie['_source']) for movie in loads_movies]
 
 
 @lru_cache()

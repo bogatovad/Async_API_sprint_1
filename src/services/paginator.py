@@ -14,7 +14,7 @@ class Paginator:
         search_after = last_item['sort']
         query_params['search_after'] = search_after
 
-        for item_page in range(1, page):
+        for item_page in range(1, int(page)):
             docs = await self.elastic.search(index=index, body=query_params)
             data = docs['hits']['hits']
             if not data:

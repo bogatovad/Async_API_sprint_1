@@ -10,6 +10,7 @@ from fastapi import Depends
 from models.api.film import Film
 from models.api.person import PersonFull
 from services.paginator import Paginator
+from services.utils import es_search_template
 
 PERSON_CACHE_EXPIRE_IN_SECONDS = 60 * 5
 
@@ -19,26 +20,19 @@ class PersonService(Paginator):
         self.redis = redis
         self.elastic = elastic
 
-    async def search_persons(self, query: str, page: int, size: int):
-        body = {
-            "query": {
-                "match": {
-                    "full_name": f"{query}"
-                }
-            },
-            "sort": {"id": "asc"},
-            "size": f"{size}",
-        }
+    async def search_persons(self, query_params):
+        page, body = es_search_template("persons", query_params)
         body_copy = body.copy()
         body_copy["index"] = "person"
+        body_copy["page"] = page
         key_person_search = pickle.dumps(body_copy)
         persons = await self.redis.get(key_person_search)
-
         if persons:
             loads_persons = pickle.loads(persons)
         else:
             loads_persons = await self.paginator("persons", body, page)
-            await self.redis.set(key_person_search, pickle.dumps(loads_persons), expire=PERSON_CACHE_EXPIRE_IN_SECONDS)
+            await self.redis.set(key_person_search, pickle.dumps(loads_persons),
+                                 expire=PERSON_CACHE_EXPIRE_IN_SECONDS)
         return [await self.get_by_id(person['_source']['id']) for person in loads_persons]
 
     async def get_film_by_id(self, person_id: str):

@@ -1,11 +1,25 @@
 from http import HTTPStatus
 from typing import List, Union
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from models.api.film import Film
 from services.film import FilmService, get_film_service
 
 router = APIRouter()
+
+
+@router.get(
+    '/search',
+    response_model=List[Film],
+    description='Поиск по фильмам',
+    response_description='Результат поиска'
+)
+async def search_movies(request: Request, film_service: FilmService = Depends(get_film_service)) -> List[Film]:
+    query_params = dict(request.query_params)
+    films = await film_service.get_search(query_params)
+    if not films:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
+    return films
 
 
 @router.get(
