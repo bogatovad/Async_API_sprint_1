@@ -1,3 +1,4 @@
+import pickle
 from functools import lru_cache
 from typing import Optional, Union
 
@@ -47,17 +48,16 @@ class FilmService(Paginator):
     async def _put_film_to_cache(self, film: Film):
         await self.redis.set(film.id, film.json(), expire=FILM_CACHE_EXPIRE_IN_SECONDS)
 
-    async def get_all_films(self, sort: str, page: int, size: int, filter: Union[str, None]):
+    async def get_all_films(self, sort: str, page: int, size: int, _filter: Union[str, None]):
         query = {}
-
-        if filter:
-            genre = await self.elastic.get("genres", filter)
+        # todo: фильтрация может быть только по жанру или есть другие варианты?
+        # todo: также стоит разнести логику метода и преобразование к http формату данных.
+        if _filter:
+            genre = await self.elastic.get("genres", _filter)
             genre_schema = GenreId(**genre['_source'])
-            query["query"] = {
-                "match": {
-                    "genre": genre_schema.name
-                }
-            }
+            query["query"] = dict(match={
+                "genre": genre_schema.name
+            })
         else:
             query["query"] = {
                 "match_all": {}
@@ -73,8 +73,15 @@ class FilmService(Paginator):
             "size": f"{size}",
         }
 
+        query_params_copy = query_params.copy()
+        query_params_copy["index"] = "movies"
+        key_list_movies = pickle.dumps(query_params_copy)
+        films = await self.redis.get(key_list_movies)
+        if films:
+            return pickle.loads(films)
         films = await self.paginator("movies", query_params, page)
         films_schema = [Film(**film['_source']) for film in films]
+        await self.redis.set(key_list_movies, pickle.dumps(films_schema))
         return films_schema
 
 
