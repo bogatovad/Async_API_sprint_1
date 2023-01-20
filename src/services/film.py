@@ -87,8 +87,8 @@ class FilmService(Paginator):
                 }
             }
         }
-        films = await self.elastic.search("movies", query_params)
-        return [Film(**film['_source']) for film in films]
+        films = await self.elastic.search(index="movies", body=query_params)
+        return [Film(**film['_source']) for film in films['hits']['hits']]
 
 
 @lru_cache()
