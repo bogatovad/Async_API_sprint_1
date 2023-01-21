@@ -12,7 +12,8 @@ HOST = 'http://docker.for.mac.localhost:8000'
         'api/v1/films/3f8873be-f6b1-4f3f-8a01-873924659851',
         'api/v1/persons/search?query=Bieber&page=1&size=10',
         'api/v1/persons/a967bacf-35ca-42ef-9bfd-3d003a957125',
-        'api/v1/persons/a967bacf-35ca-42ef-9bfd-3d003a957125/film'
+        'api/v1/persons/a967bacf-35ca-42ef-9bfd-3d003a957125/film',
+        'api/v1/films/alike/3f8873be-f6b1-4f3f-8a01-873924659851',
     )
 )
 def test_endpoints_returns_status_code_200(endpoint):
