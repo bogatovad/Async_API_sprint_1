@@ -1,4 +1,5 @@
 import pickle
+
 from functools import lru_cache
 
 from aioredis import Redis
@@ -9,30 +10,28 @@ from db.redis import get_redis
 from fastapi import Depends
 from models.api.film import Film
 from models.api.person import PersonFull
+from services.cache_backend import RedisCache
 from services.paginator import Paginator
 from services.utils import es_search_template
 
 PERSON_CACHE_EXPIRE_IN_SECONDS = 60 * 5
 
 
-class PersonService(Paginator):
+class PersonService(Paginator, RedisCache):
     def __init__(self, redis: Redis, elastic: AsyncElasticsearch):
         self.redis = redis
         self.elastic = elastic
+        self.index = "persons"
 
     async def search_persons(self, query_params):
-        page, body = es_search_template("persons", query_params)
-        body_copy = body.copy()
-        body_copy["index"] = "person"
-        body_copy["page"] = page
-        key_person_search = pickle.dumps(body_copy)
-        persons = await self.redis.get(key_person_search)
-        if persons:
-            loads_persons = pickle.loads(persons)
-        else:
-            loads_persons = await self.paginator("persons", body, page)
-            await self.redis.set(key_person_search, pickle.dumps(loads_persons),
-                                 expire=PERSON_CACHE_EXPIRE_IN_SECONDS)
+        page, body = es_search_template(self.index, query_params)
+        data_for_key = self.preparation_data_for_key(self.index, query_params)
+        key_person_search = self.create_key(data_for_key)
+        loads_persons = await self.get_from_cache(key_person_search)
+        if not loads_persons:
+            loads_persons = await self.paginator(self.index, body, page)
+            value = self.create_value(loads_persons)
+            await self.set_from_cache(key_person_search, value, PERSON_CACHE_EXPIRE_IN_SECONDS)
         return [await self.get_by_id(person['_source']['id']) for person in loads_persons]
 
     async def get_film_by_id(self, person_id: str):
@@ -101,6 +100,7 @@ class PersonService(Paginator):
         movies_director = [movie['_source']['id'] for movie in docs_director['hits']['hits']]
         return count_movies_director, movies_director
 
+    # todo: все эти методы также очень похожи друг на друга. Может стоит избегать дублирования логики?
     async def _get_actors_from_cache_or_elastic(self, person_id: str):
         key_movies_actors = f"movies_actors_{person_id}"
         data_movies_actors = await self.redis.get(key_movies_actors)

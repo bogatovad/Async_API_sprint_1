@@ -59,13 +59,18 @@ def es_search_template(index, query_params: dict) -> dict:
         filter_field = field_for_query[index]
         value_filter_field = query
 
-    query_template = {
-        "query": {
+    # если пришел запрос с фильтрацией, то выполняем match
+    # если фильтрации нет - то отдаем все записи через match_all
+    type_query = (
+        {
             "match": {
                 f"{filter_field}": f"{value_filter_field}"
             }
-        },
-        "sort": {f"{query_field_sort}": f"{query_order_sort}"},
+        } if (filter_field and value_filter_field) else {"match_all": {}})
+
+    query_template = {
+        "query": type_query,
+        "sort": {query_field_sort: query_order_sort},
         "size": query_size_data
     }
 
