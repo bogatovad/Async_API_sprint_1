@@ -1,7 +1,8 @@
 from http import HTTPStatus
-from typing import List, Union
+from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query
+from fastapi import Request
+from fastapi import APIRouter, Depends, HTTPException, Path
 from models.api.film import FilmDescriptionResponse, FilmResponse
 from services.film import FilmService, get_film_service
 
@@ -19,8 +20,14 @@ async def film_details(film_id: str, film_service: FilmService = Depends(get_fil
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
     return FilmDescriptionResponse(
-        uuid=film.id, title=film.title, imdb_rating=film.imdb_rating, description=film.description,
-        genre=film.genre, actors=film.actors, writers=film.writers, directors=film.director
+        uuid=film.id,
+        title=film.title,
+        imdb_rating=film.imdb_rating,
+        description=film.description,
+        genre=film.genre,
+        actors=film.actors,
+        writers=film.writers,
+        directors=film.director
     )
 
 
@@ -30,14 +37,9 @@ async def film_details(film_id: str, film_service: FilmService = Depends(get_fil
     description='Главная страница',
     response_description='Список фильмов на главной странице'
 )
-async def list_films(
-    page: int = Query(1, description='Номер страницы'),
-    size: int = Query(10, description='Количество фильмов на странице'),
-    filter: Union[str, None] = None,
-    sort: str = 'imdb_rating',
-    film_service: FilmService = Depends(get_film_service)
-) -> List[FilmResponse]:
-    films = await film_service.get_all_films(sort, page, size, filter)
+async def list_films(request: Request, film_service: FilmService = Depends(get_film_service)) -> List[FilmResponse]:
+    query_params = dict(request.query_params)
+    films = await film_service.get_all_films(query_params)
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
     return [FilmResponse(uuid=film.id, title=film.title, imdb_rating=film.imdb_rating) for film in films]

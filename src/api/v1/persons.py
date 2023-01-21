@@ -1,32 +1,37 @@
 from http import HTTPStatus
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+
+from fastapi import Request
+
+from fastapi import APIRouter, Depends, HTTPException
 from models.api.film import FilmResponse
 from models.api.person import PersonDescriptionResponse
+
 from services.person import PersonService, get_person_service
 
 router = APIRouter()
 
 
-# todo: возможно тут стоит написать декоратор (или класс), который обобщает логику внутри этих функций.
 @router.get(
     '/search',
     response_model=List[PersonDescriptionResponse],
     description='Поиск по персоне',
     response_description='Результат поиска'
 )
-async def search_persons(
-        query: str,
-        page: int = Query(1, description='Номер страницы'),
-        size: int = Query(10, description='Количество персон на странице'),
-        person_service: PersonService = Depends(get_person_service)
-) -> List[PersonDescriptionResponse]:
-    persons = await person_service.search_persons(query, page, size)
+async def search_persons(request: Request, person_service: PersonService = Depends(get_person_service))\
+        -> List[PersonDescriptionResponse]:
+    query_params = dict(request.query_params)
+    persons = await person_service.search_persons(query_params)
     if not persons:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films with person not found')
     return [
-        PersonDescriptionResponse(uuid=person.id, role=person.role, film_ids=person.film_ids, name=person.full_name)
+        PersonDescriptionResponse(
+            uuid=person.id,
+            role=person.role,
+            film_ids=person.film_ids,
+            name=person.full_name
+        )
         for person in persons
     ]
 

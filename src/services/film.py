@@ -1,7 +1,8 @@
 import logging
 import pickle
+
 from functools import lru_cache
-from typing import Optional, Union
+from typing import Optional
 
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch, NotFoundError
@@ -11,16 +12,19 @@ from db.elastic import get_elastic
 from db.redis import get_redis
 from fastapi import Depends
 from models.services.film import Film
-from models.services.genre import Genre
+from services.cache_backend import RedisCache
+
 from services.paginator import Paginator
+from services.utils import es_search_template
 
 logger = logging.getLogger(__name__)
 
 
-class FilmService(Paginator):
+class FilmService(Paginator, RedisCache):
     def __init__(self, redis: Redis, elastic: AsyncElasticsearch):
         self.redis = redis
         self.elastic = elastic
+        self.index = "movies"
 
     async def get_by_id(self, film_id: str) -> Optional[Film]:
         film = await self._film_from_cache(film_id)
@@ -50,42 +54,6 @@ class FilmService(Paginator):
     async def _put_film_to_cache(self, film: Film):
         await self.redis.set(film.id, film.json(), expire=FILM_CACHE_EXPIRE_IN_SECONDS)
 
-    async def get_all_films(self, sort: str, page: int, size: int, _filter: Union[str, None]):
-        query = {}
-        # todo: фильтрация может быть только по жанру или есть другие варианты?
-        # todo: также стоит разнести логику метода и преобразование к http формату данных.
-        if _filter:
-            genre = await self.elastic.get("genres", _filter)
-            genre_schema = Genre(**genre['_source'])
-            query["query"] = dict(match={
-                "genre": genre_schema.name
-            })
-        else:
-            query["query"] = {
-                "match_all": {}
-            }
-        order_sort = "desc" if sort[0] == '-' else "asc"
-        query_params = {
-            **query,
-            "sort": {
-                "imdb_rating": {
-                    "order": order_sort
-                }
-            },
-            "size": f"{size}",
-        }
-
-        query_params_copy = query_params.copy()
-        query_params_copy["index"] = "movies"
-        key_list_movies = pickle.dumps(query_params_copy)
-        films = await self.redis.get(key_list_movies)
-        if films:
-            return pickle.loads(films)
-        films = await self.paginator("movies", query_params, page)
-        films_schema = [Film(**film['_source']) for film in films]
-        await self.redis.set(key_list_movies, pickle.dumps(films_schema))
-        return films_schema
-
     async def get_films_alike(self, film_id: str):
         cache_key = f'films/alike/{film_id}'
         films = await self.redis.get(cache_key)
@@ -108,6 +76,31 @@ class FilmService(Paginator):
         await self.redis.set(cache_key, pickle.dumps(films), expire=FILM_CACHE_EXPIRE_IN_SECONDS)
 
         return films
+
+    async def get_all_films(self, query_params):
+        page, body = es_search_template(self.index, query_params)
+        data_for_key = self.preparation_data_for_key(self.index, query_params)
+        key_list_movies = self.create_key(data_for_key)
+        loads_films = await self.get_from_cache(key_list_movies)
+        if loads_films is not None:
+            return loads_films
+        loads_films = await self.paginator(self.index, body, page)
+        films_schema = [Film(**film['_source']) for film in loads_films]
+        value = self.create_value(films_schema)
+        await self.set_to_cache(key_list_movies, value, FILM_CACHE_EXPIRE_IN_SECONDS)
+        return films_schema
+
+    async def get_search(self, query_params):
+        page, body = es_search_template(self.index, query_params)
+        data_for_key = self.preparation_data_for_key(self.index, query_params)
+        key_movies_search = self.create_key(data_for_key)
+        loads_movies = await self.get_from_cache(key_movies_search)
+
+        if not loads_movies:
+            loads_movies = await self.paginator(self.index, body, page)
+            value = self.create_value(loads_movies)
+            await self.set_to_cache(key_movies_search, value, FILM_CACHE_EXPIRE_IN_SECONDS)
+        return [Film(**movie['_source']) for movie in loads_movies]
 
 
 @lru_cache()

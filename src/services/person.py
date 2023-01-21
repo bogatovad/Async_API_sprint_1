@@ -1,44 +1,36 @@
 import pickle
+
 from functools import lru_cache
 
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch
 
+from core.config import PERSON_CACHE_EXPIRE_IN_SECONDS
 from db.elastic import get_elastic
 from db.redis import get_redis
 from fastapi import Depends
+from services.cache_backend import RedisCache
 from models.services.film import FilmShort
 from models.services.person import PersonDescription
 from services.paginator import Paginator
+from services.utils import es_search_template
 
-PERSON_CACHE_EXPIRE_IN_SECONDS = 60 * 5
 
-
-class PersonService(Paginator):
+class PersonService(Paginator, RedisCache):
     def __init__(self, redis: Redis, elastic: AsyncElasticsearch):
         self.redis = redis
         self.elastic = elastic
+        self.index = "persons"
 
-    async def search_persons(self, query: str, page: int, size: int):
-        body = {
-            "query": {
-                "match": {
-                    "full_name": f"{query}"
-                }
-            },
-            "sort": {"id": "asc"},
-            "size": f"{size}",
-        }
-        body_copy = body.copy()
-        body_copy["index"] = "person"
-        key_person_search = pickle.dumps(body_copy)
-        persons = await self.redis.get(key_person_search)
-
-        if persons:
-            loads_persons = pickle.loads(persons)
-        else:
-            loads_persons = await self.paginator("persons", body, page)
-            await self.redis.set(key_person_search, pickle.dumps(loads_persons), expire=PERSON_CACHE_EXPIRE_IN_SECONDS)
+    async def search_persons(self, query_params):
+        page, body = es_search_template(self.index, query_params)
+        data_for_key = self.preparation_data_for_key(self.index, query_params)
+        key_person_search = self.create_key(data_for_key)
+        loads_persons = await self.get_from_cache(key_person_search)
+        if not loads_persons:
+            loads_persons = await self.paginator(self.index, body, page)
+            value = self.create_value(loads_persons)
+            await self.set_to_cache(key_person_search, value, PERSON_CACHE_EXPIRE_IN_SECONDS)
         return [await self.get_by_id(person['_source']['id']) for person in loads_persons]
 
     async def get_film_by_id(self, person_id: str):
