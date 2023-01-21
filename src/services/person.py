@@ -5,6 +5,7 @@ from functools import lru_cache
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch
 
+from core.config import PERSON_CACHE_EXPIRE_IN_SECONDS
 from db.elastic import get_elastic
 from db.redis import get_redis
 from fastapi import Depends
@@ -13,8 +14,6 @@ from models.services.film import FilmShort
 from models.services.person import PersonDescription
 from services.paginator import Paginator
 from services.utils import es_search_template
-
-PERSON_CACHE_EXPIRE_IN_SECONDS = 60 * 5
 
 
 class PersonService(Paginator, RedisCache):
@@ -31,7 +30,7 @@ class PersonService(Paginator, RedisCache):
         if not loads_persons:
             loads_persons = await self.paginator(self.index, body, page)
             value = self.create_value(loads_persons)
-            await self.set_from_cache(key_person_search, value, PERSON_CACHE_EXPIRE_IN_SECONDS)
+            await self.set_to_cache(key_person_search, value, PERSON_CACHE_EXPIRE_IN_SECONDS)
         return [await self.get_by_id(person['_source']['id']) for person in loads_persons]
 
     async def get_film_by_id(self, person_id: str):
@@ -100,7 +99,6 @@ class PersonService(Paginator, RedisCache):
         movies_director = [movie['_source']['id'] for movie in docs_director['hits']['hits']]
         return count_movies_director, movies_director
 
-    # todo: все эти методы также очень похожи друг на друга. Может стоит избегать дублирования логики?
     async def _get_actors_from_cache_or_elastic(self, person_id: str):
         key_movies_actors = f"movies_actors_{person_id}"
         data_movies_actors = await self.redis.get(key_movies_actors)

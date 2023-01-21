@@ -17,7 +17,7 @@ class CacheBackend(ABC):
         """Получить данные из кэша."""
         pass
 
-    async def set_from_cache(self, key, value, expire):
+    async def set_to_cache(self, key, value, expire):
         """Положить данные в кэш."""
         pass
 
@@ -45,5 +45,5 @@ class RedisCache(CacheBackend):
             loads_objects_from_cache = pickle.loads(get_from_cache)
         return loads_objects_from_cache
 
-    async def set_from_cache(self, key, value, expire):
+    async def set_to_cache(self, key, value, expire):
         await self.redis.set(key, value, expire=expire)

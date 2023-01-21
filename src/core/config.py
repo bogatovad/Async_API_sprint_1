@@ -24,3 +24,5 @@ FASTAPI_PORT = env("FASTAPI_PORT", 8000)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5
+GENRE_CACHE_EXPIRE_IN_SECONDS = 60 * 5
+PERSON_CACHE_EXPIRE_IN_SECONDS = 60 * 5

@@ -87,7 +87,7 @@ class FilmService(Paginator, RedisCache):
         loads_films = await self.paginator(self.index, body, page)
         films_schema = [Film(**film['_source']) for film in loads_films]
         value = self.create_value(films_schema)
-        await self.set_from_cache(key_list_movies, value, FILM_CACHE_EXPIRE_IN_SECONDS)
+        await self.set_to_cache(key_list_movies, value, FILM_CACHE_EXPIRE_IN_SECONDS)
         return films_schema
 
     async def get_search(self, query_params):
@@ -99,7 +99,7 @@ class FilmService(Paginator, RedisCache):
         if not loads_movies:
             loads_movies = await self.paginator(self.index, body, page)
             value = self.create_value(loads_movies)
-            await self.set_from_cache(key_movies_search, value, FILM_CACHE_EXPIRE_IN_SECONDS)
+            await self.set_to_cache(key_movies_search, value, FILM_CACHE_EXPIRE_IN_SECONDS)
         return [Film(**movie['_source']) for movie in loads_movies]
 
 
