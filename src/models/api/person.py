@@ -19,3 +19,4 @@ class PersonDescriptionResponse(PersonResponse):
 
 class FilmPersonResponse(ORJSONBaseModel):
     uuid: str = Field(alias='id')
+    name: str
