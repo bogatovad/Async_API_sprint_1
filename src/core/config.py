@@ -22,3 +22,5 @@ FASTAPI_HOST = env("FASTAPI_HOST", "0.0.0.0")
 FASTAPI_PORT = env("FASTAPI_PORT", 8000)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5
