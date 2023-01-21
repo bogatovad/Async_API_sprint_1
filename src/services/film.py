@@ -1,3 +1,4 @@
+import logging
 import pickle
 from functools import lru_cache
 from typing import Optional, Union
@@ -5,6 +6,7 @@ from typing import Optional, Union
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch, NotFoundError
 
+from core.config import FILM_CACHE_EXPIRE_IN_SECONDS
 from db.elastic import get_elastic
 from db.redis import get_redis
 from fastapi import Depends
@@ -12,7 +14,7 @@ from models.services.film import Film
 from models.services.genre import Genre
 from services.paginator import Paginator
 
-FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5
+logger = logging.getLogger(__name__)
 
 
 class FilmService(Paginator):
@@ -83,6 +85,29 @@ class FilmService(Paginator):
         films_schema = [Film(**film['_source']) for film in films]
         await self.redis.set(key_list_movies, pickle.dumps(films_schema))
         return films_schema
+
+    async def get_films_alike(self, film_id: str):
+        cache_key = f'films/alike/{film_id}'
+        films = await self.redis.get(cache_key)
+        if films:
+            logger.debug(f'Getting info from cache by key {cache_key}')
+            return pickle.loads(films)
+        film = await self.get_by_id(film_id)
+        genres = film.genre
+        query_params = {
+            "query": {
+                "terms": {
+                    "genre": genres
+                }
+            }
+        }
+        films = await self.elastic.search(index="movies", body=query_params)
+        films = [Film(**film['_source']) for film in films['hits']['hits']]
+
+        logger.debug(f'Storing info ini cache by key {cache_key}')
+        await self.redis.set(cache_key, pickle.dumps(films), expire=FILM_CACHE_EXPIRE_IN_SECONDS)
+
+        return films
 
 
 @lru_cache()
