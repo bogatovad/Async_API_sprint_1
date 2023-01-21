@@ -1,10 +1,6 @@
-from models.mixins import ORJSONBaseModel
+from models.mixins import IDMixin, ORJSONBaseModel
 
 
-class Genre(ORJSONBaseModel):
-    name: str
-
-
-class GenreId(ORJSONBaseModel):
+class Genre(IDMixin, ORJSONBaseModel):
     id: str
     name: str

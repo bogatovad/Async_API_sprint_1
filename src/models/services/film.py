@@ -1,16 +1,21 @@
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
-from models.services.person import Person
+from models.mixins import IDMixin, ORJSONBaseModel
+from models.services.person import FilmPerson
 
 
-class Film(BaseModel):
-    id: str
+class FilmShort(IDMixin, ORJSONBaseModel):
+    title: str
+    imdb_rating: float
+
+
+class Film(FilmShort):
     title: Optional[str]
     imdb_rating: Optional[float]
     description: Optional[str]
     genre: Optional[List[str]] = Field(default=[])
-    actors: Optional[List[Person]] = Field(default=[])
-    writers: Optional[List[Person]] = Field(default=[])
+    actors: Optional[List[FilmPerson]] = Field(default=[])
+    writers: Optional[List[FilmPerson]] = Field(default=[])
     director: Optional[List[str]] = Field(default=[])

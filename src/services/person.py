@@ -7,8 +7,8 @@ from elasticsearch import AsyncElasticsearch
 from db.elastic import get_elastic
 from db.redis import get_redis
 from fastapi import Depends
-from models.api.film import Film
-from models.api.person import PersonFull
+from models.services.film import FilmShort
+from models.services.person import PersonDescription
 from services.paginator import Paginator
 
 PERSON_CACHE_EXPIRE_IN_SECONDS = 60 * 5
@@ -55,7 +55,7 @@ class PersonService(Paginator):
             }
         }
         docs_actors = await self.elastic.search(index="movies", body=body)
-        return [Film(**movie['_source']) for movie in docs_actors['hits']['hits']]
+        return [FilmShort(**movie['_source']) for movie in docs_actors['hits']['hits']]
 
     async def _get_movies_actors(self, person_id: str):
         person = await self.elastic.get("persons", person_id)
@@ -153,7 +153,7 @@ class PersonService(Paginator):
                     ('director', count_movies_director)
                 ) if role[1] != 0
         ]
-        return PersonFull(**person['_source'], role=role, film_ids=film_ids)
+        return PersonDescription(**person['_source'], role=role, film_ids=film_ids)
 
 
 @lru_cache()

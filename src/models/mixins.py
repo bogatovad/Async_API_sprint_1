@@ -14,5 +14,9 @@ class ORJSONBaseModel(BaseModel):
         json_dumps = orjson_dumps
 
 
-class UUIDMixin(BaseModel):
+class IDMixin(BaseModel):
     id: str
+
+
+class UUIDMixin(BaseModel):
+    uuid: str

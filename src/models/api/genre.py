@@ -1,6 +1,5 @@
-from pydantic import BaseModel
+from models.mixins import ORJSONBaseModel, UUIDMixin
 
 
-class Genre(BaseModel):
-    id: str
+class GenreResponse(UUIDMixin, ORJSONBaseModel):
     name: str

@@ -1,6 +1,19 @@
-from models.mixins import ORJSONBaseModel
+from typing import List
+
+from models.mixins import IDMixin, ORJSONBaseModel
 
 
-class Person(ORJSONBaseModel):
-    id: str
+class Person(IDMixin, ORJSONBaseModel):
+    full_name: str
+
+
+class FilmPerson(IDMixin, ORJSONBaseModel):
     name: str
+
+
+class PersonDescription(Person):
+    """Данные по персоне.
+    Для ручки /api/v1/persons/<uuid:UUID>/
+    """
+    role: List[str]
+    film_ids: List[str]

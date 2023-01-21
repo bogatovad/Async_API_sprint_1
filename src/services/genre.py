@@ -8,7 +8,7 @@ from elasticsearch import AsyncElasticsearch, NotFoundError
 from db.elastic import get_elastic
 from db.redis import get_redis
 from fastapi import Depends
-from models.services.genre import GenreId
+from models.services.genre import Genre
 
 GENRE_CACHE_EXPIRE_IN_SECONDS = 60 * 5
 
@@ -27,22 +27,22 @@ class GenreService:
             await self._put_genre_to_cache(genre)
         return genre
 
-    async def _get_genre_from_elastic(self, genre_id: str) -> Optional[GenreId]:
+    async def _get_genre_from_elastic(self, genre_id: str) -> Optional[Genre]:
         try:
             doc = await self.elastic.get('genres', genre_id)
         except NotFoundError:
             return None
         doc = doc['_source']
-        return GenreId(**doc)
+        return Genre(**doc)
 
     async def _genre_from_cache(self, genre_id: str):
         data = await self.redis.get(genre_id)
         if not data:
             return None
-        genre = GenreId.parse_raw(data)
+        genre = Genre.parse_raw(data)
         return genre
 
-    async def _put_genre_to_cache(self, genre: GenreId):
+    async def _put_genre_to_cache(self, genre: Genre):
         await self.redis.set(genre.id, genre.json(), expire=GENRE_CACHE_EXPIRE_IN_SECONDS)
 
     async def get_list(self):
@@ -56,12 +56,12 @@ class GenreService:
         await self.redis.set(key_list_genres, pickle.dumps(genres), expire=GENRE_CACHE_EXPIRE_IN_SECONDS)
         return genres
 
-    async def _get_genre_list_from_elastic(self) -> Optional[List[GenreId]]:
+    async def _get_genre_list_from_elastic(self) -> Optional[List[Genre]]:
         try:
             docs = await self.elastic.search(index="genres", body={"query": {"match_all": {}}})
         except NotFoundError:
             return []
-        return [GenreId(**genre['_source']) for genre in docs['hits']['hits']]
+        return [Genre(**genre['_source']) for genre in docs['hits']['hits']]
 
 
 @lru_cache()
