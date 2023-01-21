@@ -32,13 +32,18 @@ make flake8
 make isort
 ```
 
+## Тестрование
+Для запуска тестов выполнить при запущенном сервисе: 
+```
+make test
+```
+
 ## API сервисы
 
  - Полный список фильмов: http://localhost:8000/api/v1/films/
- - Фильм по UUID: http://localhost:8000/api/v1/film/<film_uuid>/
- - Похожие фильмы: http://localhost:8000/api/v1/films/alike/<film_uuid>/
+ - Фильм по UUID: http://localhost:8000/api/v1/film/film_uuid/
+ - Похожие фильмы: http://localhost:8000/api/v1/films/alike/film_uuid/
  - Поиск по фильмам: http://localhost:8000/api/v1/film/search/
- - Популярные фильмы в жанре: http://localhost:8000/api/v1/film/genre/<uuid>/
  - Информация о киноперсоне по UUID: http://localhost:8000/api/v1/person/<person_uuid>/
  - Поиск по киноперсонам: http://localhost:8000/api/v1/person/search/
  - Получить фильмы по персоне - http://localhost:8000/api/v1/person/<person_uuid>/film/
@@ -48,6 +53,3 @@ make isort
 
 ## Документация API
 Доступна по адресу `http://{FASTAPI_HOST}:{FASTAPI_PORT}/api/openapi`
-
-### Ссылка на сервис ETL
-https://github.com/bogatovad/new_admin_panel_sprint_3
