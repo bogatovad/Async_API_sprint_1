@@ -54,3 +54,6 @@ make test
 
 ## Документация API
 Доступна по адресу `http://{FASTAPI_HOST}:{FASTAPI_PORT}/api/openapi`
+
+### Ссылка на сервис ETL
+https://github.com/bogatovad/new_admin_panel_sprint_3
