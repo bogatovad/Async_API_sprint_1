@@ -44,11 +44,11 @@ make test
  - Фильм по UUID: http://localhost:8000/api/v1/film/film_uuid/
  - Похожие фильмы: http://localhost:8000/api/v1/films/alike/film_uuid/
  - Поиск по фильмам: http://localhost:8000/api/v1/film/search/
- - Информация о киноперсоне по UUID: http://localhost:8000/api/v1/person/<person_uuid>/
+ - Информация о киноперсоне по UUID: http://localhost:8000/api/v1/person/person_uuid/
  - Поиск по киноперсонам: http://localhost:8000/api/v1/person/search/
- - Получить фильмы по персоне - http://localhost:8000/api/v1/person/<person_uuid>/film/
+ - Получить фильмы по персоне - http://localhost:8000/api/v1/person/person_uuid/film/
  - Список жанров: http://localhost:8000/api/v1/genre/
- - Информация по жанру: http://localhost:8000/api/v1/genre/<genre_uuid>/
+ - Информация по жанру: http://localhost:8000/api/v1/genre/genre_uuid/
 
 
 ## Документация API
