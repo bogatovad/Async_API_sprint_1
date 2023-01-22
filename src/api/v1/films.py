@@ -1,8 +1,8 @@
 from http import HTTPStatus
 from typing import List
 
-from fastapi import Request
-from fastapi import APIRouter, Depends, HTTPException, Path
+from fastapi import APIRouter, Depends, HTTPException, Path, Request
+
 from models.api.film import FilmDescriptionResponse, FilmResponse
 from services.film import FilmService, get_film_service
 

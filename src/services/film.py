@@ -1,19 +1,17 @@
 import logging
 import pickle
-
 from functools import lru_cache
 from typing import Optional
 
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch, NotFoundError
+from fastapi import Depends
 
 from core.config import FILM_CACHE_EXPIRE_IN_SECONDS
 from db.elastic import get_elastic
 from db.redis import get_redis
-from fastapi import Depends
 from models.services.film import Film
 from services.cache_backend import RedisCache
-
 from services.paginator import Paginator
 from services.utils import es_search_template
 
