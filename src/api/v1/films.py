@@ -4,7 +4,7 @@ from fastapi import Request
 from fastapi import APIRouter, Depends, HTTPException, Path
 
 from core.messages import ErrorMessage
-from models.api.film import FilmDescriptionResponse, FilmResponse
+from api.v1.models.film import FilmDescriptionResponse, FilmResponse
 from services.film import FilmService, get_film_service
 
 router = APIRouter()
