@@ -35,10 +35,18 @@ services:
         - data_elasticsearch:/usr/share/elasticsearch/data
       expose:
         - 9200
-      ports:
-        - 9200:9200
       env_file:
         - enviroments/.env_elastic
+
+    nginx:
+      image: nginx:latest
+      volumes:
+        - ./nginx.conf:/etc/nginx/nginx.conf:ro
+        - ./configs:/etc/nginx/conf.d:ro
+      depends_on:
+        - fastapi
+      ports:
+        - "80:80"
 
 volumes:
   data_postgres:
