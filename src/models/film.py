@@ -1,7 +1,7 @@
 from pydantic import Field
 
-from models.mixins import IDMixin, ORJSONBaseModel
-from models.services.person import FilmPerson
+from core.mixins import IDMixin, ORJSONBaseModel
+from models.person import FilmPerson
 
 
 class FilmShort(IDMixin, ORJSONBaseModel):
