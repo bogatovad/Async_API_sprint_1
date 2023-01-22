@@ -2,7 +2,6 @@ import logging
 import pickle
 
 from functools import lru_cache
-from typing import Optional
 
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch, NotFoundError
@@ -26,7 +25,7 @@ class FilmService(Paginator, RedisCache):
         self.elastic = elastic
         self.index = "movies"
 
-    async def get_by_id(self, film_id: str) -> Optional[Film]:
+    async def get_by_id(self, film_id: str) -> Film | None:
         film = await self._film_from_cache(film_id)
         if not film:
             film = await self._get_film_from_elastic(film_id)
@@ -36,7 +35,7 @@ class FilmService(Paginator, RedisCache):
 
         return film
 
-    async def _get_film_from_elastic(self, film_id: str) -> Optional[Film]:
+    async def _get_film_from_elastic(self, film_id: str) -> Film | None:
         try:
             doc = await self.elastic.get('movies', film_id)
         except NotFoundError:
@@ -44,7 +43,7 @@ class FilmService(Paginator, RedisCache):
         doc = doc['_source']
         return Film(**doc)
 
-    async def _film_from_cache(self, film_id: str) -> Optional[Film]:
+    async def _film_from_cache(self, film_id: str) -> Film | None:
         data = await self.redis.get(film_id)
         if not data:
             return None
