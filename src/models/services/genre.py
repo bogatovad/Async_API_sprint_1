@@ -1,4 +1,4 @@
-from models.mixins import IDMixin, ORJSONBaseModel
+from core.mixins import IDMixin, ORJSONBaseModel
 
 
 class Genre(IDMixin, ORJSONBaseModel):

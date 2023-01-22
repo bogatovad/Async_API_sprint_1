@@ -1,5 +1,4 @@
 import pickle
-
 from functools import lru_cache
 
 from aioredis import Redis
@@ -9,9 +8,9 @@ from core.config import PERSON_CACHE_EXPIRE_IN_SECONDS
 from db.elastic import get_elastic
 from db.redis import get_redis
 from fastapi import Depends
-from services.cache_backend import RedisCache
 from models.services.film import FilmShort
 from models.services.person import PersonDescription
+from services.cache_backend import RedisCache
 from services.paginator import Paginator
 from services.utils import es_search_template
 

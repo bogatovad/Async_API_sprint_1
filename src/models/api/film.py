@@ -1,7 +1,7 @@
 from typing import List, Optional
 
+from core.mixins import ORJSONBaseModel, UUIDMixin
 from models.api.person import FilmPersonResponse
-from models.mixins import ORJSONBaseModel, UUIDMixin
 
 
 class FilmResponse(UUIDMixin, ORJSONBaseModel):

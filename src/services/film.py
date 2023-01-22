@@ -1,6 +1,5 @@
 import logging
 import pickle
-
 from functools import lru_cache
 from typing import Optional
 
@@ -13,7 +12,6 @@ from db.redis import get_redis
 from fastapi import Depends
 from models.services.film import Film
 from services.cache_backend import RedisCache
-
 from services.paginator import Paginator
 from services.utils import es_search_template
 
