@@ -1,4 +1,4 @@
-from models.mixins import ORJSONBaseModel, UUIDMixin
+from core.mixins import ORJSONBaseModel, UUIDMixin
 
 
 class GenreResponse(UUIDMixin, ORJSONBaseModel):

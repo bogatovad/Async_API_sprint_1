@@ -1,6 +1,6 @@
 from pydantic import Field
 
-from models.mixins import ORJSONBaseModel, UUIDMixin
+from core.mixins import ORJSONBaseModel, UUIDMixin
 
 
 class PersonResponse(UUIDMixin, ORJSONBaseModel):

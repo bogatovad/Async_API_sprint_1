@@ -25,7 +25,7 @@ services:
       volumes:
         - data_postgres:/var/lib/postgresql/data/
       env_file:
-        - enviroments/.env
+        - envs/.env
       expose:
         - 9200
 
@@ -36,7 +36,7 @@ services:
       expose:
         - 9200
       env_file:
-        - enviroments/.env_elastic
+        - envs/.env_elastic
 
     nginx:
       image: nginx:latest

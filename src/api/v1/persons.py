@@ -1,9 +1,9 @@
 from http import HTTPStatus
 from typing import List
 
+from api.v1.models.film import FilmResponse
+from api.v1.models.person import PersonDescriptionResponse
 from fastapi import APIRouter, Depends, HTTPException, Request
-from models.api.film import FilmResponse
-from models.api.person import PersonDescriptionResponse
 from services.person import PersonService, get_person_service
 
 router = APIRouter()

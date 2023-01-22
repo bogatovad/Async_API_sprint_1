@@ -1,8 +1,8 @@
 from http import HTTPStatus
 from typing import List
 
+from api.v1.models.genre import GenreResponse
 from fastapi import APIRouter, Depends, HTTPException
-from models.api.genre import GenreResponse
 from services.genre import GenreService, get_genre_service
 
 router = APIRouter()

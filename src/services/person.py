@@ -8,8 +8,8 @@ from core.config import settings
 from db.elastic import get_elastic
 from db.redis import get_redis
 from fastapi import Depends
-from models.services.film import FilmShort
-from models.services.person import PersonDescription
+from models.film import FilmShort
+from models.person import PersonDescription
 from services.cache_backend import RedisCache
 from services.paginator import Paginator
 from services.utils import es_search_template

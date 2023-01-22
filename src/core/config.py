@@ -30,7 +30,7 @@ class Settings(BaseSettings):
 
     class Config:
         BASE_DIR: str = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        env_file = os.path.join(BASE_DIR, 'enviromens/.env')
+        env_file = os.path.join(BASE_DIR, 'envs/.env')
 
 
 settings = Settings()
