@@ -1,5 +1,3 @@
-from typing import List
-
 from models.mixins import IDMixin, ORJSONBaseModel
 
 
@@ -15,5 +13,5 @@ class PersonDescription(Person):
     """Данные по персоне.
     Для ручки /api/v1/persons/<uuid:UUID>/
     """
-    role: List[str]
-    film_ids: List[str]
+    role: list[str]
+    film_ids: list[str]

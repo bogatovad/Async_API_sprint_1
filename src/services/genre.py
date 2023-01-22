@@ -1,6 +1,6 @@
 import pickle
 from functools import lru_cache
-from typing import List, Optional
+#from typing import List, Optional
 
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch, NotFoundError
@@ -26,7 +26,7 @@ class GenreService:
             await self._put_genre_to_cache(genre)
         return genre
 
-    async def _get_genre_from_elastic(self, genre_id: str) -> Optional[Genre]:
+    async def _get_genre_from_elastic(self, genre_id: str) -> Genre | None:
         try:
             doc = await self.elastic.get('genres', genre_id)
         except NotFoundError:
@@ -55,7 +55,7 @@ class GenreService:
         await self.redis.set(key_list_genres, pickle.dumps(genres), expire=GENRE_CACHE_EXPIRE_IN_SECONDS)
         return genres
 
-    async def _get_genre_list_from_elastic(self) -> Optional[List[Genre]]:
+    async def _get_genre_list_from_elastic(self) -> list[Genre] | None:
         try:
             docs = await self.elastic.search(index="genres", body={"query": {"match_all": {}}})
         except NotFoundError:

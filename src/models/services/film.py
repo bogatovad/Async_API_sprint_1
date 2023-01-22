@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 from pydantic import Field
 
 from models.mixins import IDMixin, ORJSONBaseModel
@@ -12,10 +10,10 @@ class FilmShort(IDMixin, ORJSONBaseModel):
 
 
 class Film(FilmShort):
-    title: Optional[str]
-    imdb_rating: Optional[float]
-    description: Optional[str]
-    genre: Optional[List[str]] = Field(default=[])
-    actors: Optional[List[FilmPerson]] = Field(default=[])
-    writers: Optional[List[FilmPerson]] = Field(default=[])
-    director: Optional[List[str]] = Field(default=[])
+    title: str | None
+    imdb_rating: float | None
+    description: str | None
+    genre: list[str] | None = Field(default=[])
+    actors: list[FilmPerson] | None = Field(default=[])
+    writers: list[FilmPerson] | None = Field(default=[])
+    director: list[str] | None = Field(default=[])
