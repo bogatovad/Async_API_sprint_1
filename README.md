@@ -32,11 +32,11 @@ make flake8
 make isort
 ```
 
-## Тестрование
-Для запуска тестов выполнить при запущенном сервисе: 
-```
-make test
-```
+## Ссылки на сервисы
+
+1. https://github.com/bogatovad/Async_API_sprint_1
+2. https://github.com/bogatovad/new_admin_panel_sprint_3
+
 
 ## API сервисы
 
