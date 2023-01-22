@@ -1,17 +1,16 @@
 import pickle
-
 from functools import lru_cache
 
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch
 
-from core.config import PERSON_CACHE_EXPIRE_IN_SECONDS
+from core.config import settings
 from db.elastic import get_elastic
 from db.redis import get_redis
 from fastapi import Depends
-from services.cache_backend import RedisCache
 from models.services.film import FilmShort
 from models.services.person import PersonDescription
+from services.cache_backend import RedisCache
 from services.paginator import Paginator
 from services.utils import es_search_template
 
@@ -30,7 +29,7 @@ class PersonService(Paginator, RedisCache):
         if not loads_persons:
             loads_persons = await self.paginator(self.index, body, page)
             value = self.create_value(loads_persons)
-            await self.set_to_cache(key_person_search, value, PERSON_CACHE_EXPIRE_IN_SECONDS)
+            await self.set_to_cache(key_person_search, value, settings.PERSON_CACHE_EXPIRE_IN_SECONDS)
         return [await self.get_by_id(person['_source']['id']) for person in loads_persons]
 
     async def get_film_by_id(self, person_id: str):
@@ -107,7 +106,7 @@ class PersonService(Paginator, RedisCache):
         else:
             person, count_movies_actor, movies_actor = await self._get_movies_actors(person_id)
             await self.redis.set(key_movies_actors, pickle.dumps([person, count_movies_actor, movies_actor]),
-                                 expire=PERSON_CACHE_EXPIRE_IN_SECONDS)
+                                 expire=settings.PERSON_CACHE_EXPIRE_IN_SECONDS)
         return person, count_movies_actor, movies_actor
 
     async def _get_writers_from_cache_or_elastic(self, person_id: str):
@@ -118,7 +117,7 @@ class PersonService(Paginator, RedisCache):
         else:
             count_movies_writers, movies_writer = await self._get_movies_writers(person_id)
             await self.redis.set(key_movies_writers, pickle.dumps([count_movies_writers, movies_writer]),
-                                 expire=PERSON_CACHE_EXPIRE_IN_SECONDS)
+                                 expire=settings.PERSON_CACHE_EXPIRE_IN_SECONDS)
         return count_movies_writers, movies_writer
 
     async def _get_directors_from_cache_or_elastic(self, person_id: str, full_name: str):
@@ -129,7 +128,7 @@ class PersonService(Paginator, RedisCache):
         else:
             count_movies_director, movies_director = await self._get_movies_directors(full_name)
             await self.redis.set(key_movies_directors, pickle.dumps([count_movies_director, movies_director]),
-                                 expire=PERSON_CACHE_EXPIRE_IN_SECONDS)
+                                 expire=settings.PERSON_CACHE_EXPIRE_IN_SECONDS)
         return count_movies_director, movies_director
 
     async def get_by_id(self, person_id: str):
