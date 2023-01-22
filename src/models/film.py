@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import Field
 
 from core.mixins import IDMixin, ORJSONBaseModel
-from models.services.person import FilmPerson
+from models.person import FilmPerson
 
 
 class FilmShort(IDMixin, ORJSONBaseModel):
