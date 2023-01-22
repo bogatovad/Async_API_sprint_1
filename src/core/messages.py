@@ -1,4 +1,4 @@
-class ErrorResponse:
+class ErrorMessage:
 
     FILM_NOT_FOUND = 'film not found'
     GENRE_NOT_FOUND = 'genre not found'

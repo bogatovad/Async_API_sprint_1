@@ -3,7 +3,7 @@ from http import HTTPStatus
 from fastapi import Request
 from fastapi import APIRouter, Depends, HTTPException, Path
 
-from core.messages import ErrorResponse
+from core.messages import ErrorMessage
 from models.api.film import FilmDescriptionResponse, FilmResponse
 from services.film import FilmService, get_film_service
 
@@ -19,7 +19,7 @@ router = APIRouter()
 async def film_details(film_id: str, film_service: FilmService = Depends(get_film_service)) -> FilmDescriptionResponse:
     film = await film_service.get_by_id(film_id)
     if not film:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=ErrorResponse.FILM_NOT_FOUND)
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=ErrorMessage.FILM_NOT_FOUND)
     return FilmDescriptionResponse(
         uuid=film.id,
         title=film.title,
@@ -42,7 +42,7 @@ async def list_films(request: Request, film_service: FilmService = Depends(get_f
     query_params = dict(request.query_params)
     films = await film_service.get_all_films(query_params)
     if not films:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=ErrorResponse.FILM_NOT_FOUND)
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=ErrorMessage.FILM_NOT_FOUND)
     return [FilmResponse(uuid=film.id, title=film.title, imdb_rating=film.imdb_rating) for film in films]
 
 
@@ -58,5 +58,5 @@ async def films_alike(
 ) -> list[FilmResponse]:
     films = await film_service.get_films_alike(film_id)
     if not films:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=ErrorResponse.FILM_NOT_FOUND)
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=ErrorMessage.FILM_NOT_FOUND)
     return [FilmResponse(uuid=film.id, title=film.title, imdb_rating=film.imdb_rating) for film in films]
