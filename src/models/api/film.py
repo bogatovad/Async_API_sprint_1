@@ -7,7 +7,7 @@ from models.mixins import ORJSONBaseModel, UUIDMixin
 class FilmResponse(UUIDMixin, ORJSONBaseModel):
     """Модель ответа API с информацией о фильмах."""
     title: str
-    imdb_rating: float
+    imdb_rating: Optional[float]
 
 
 class FilmDescriptionResponse(FilmResponse):

@@ -38,7 +38,7 @@ def es_search_template(index, query_params: dict) -> dict:
     query_field_sort = query_field_sort[1:] if query_sort and query_sort[0] == '-' else query_field_sort
 
     # получаем данные для установки размера страницы: page[size].
-    query_size = query_params.get('page[size]')
+    query_size = query_params.get('page_size')
     query_size_data = query_size if query_size is not None else page_size_default
 
     # получаем поле по которому происходит фильтрация.
@@ -74,6 +74,6 @@ def es_search_template(index, query_params: dict) -> dict:
         "size": query_size_data
     }
 
-    query_number_page = query_params.get('page[number]')
+    query_number_page = query_params.get('page_number')
     number_page = query_number_page if query_number_page is not None else number_page_default
     return number_page, query_template
