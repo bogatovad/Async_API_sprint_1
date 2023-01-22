@@ -1,9 +1,11 @@
 from http import HTTPStatus
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query
+from fastapi import Query
 
-from models.api.film import FilmDescriptionResponse, FilmResponse
+from api.v1.models.film import FilmDescriptionResponse, FilmResponse
+from fastapi import APIRouter, Depends, HTTPException, Path
+
 from services.film import FilmService, get_film_service
 
 router = APIRouter()

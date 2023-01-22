@@ -1,8 +1,6 @@
-from typing import List
-
 from pydantic import Field
 
-from models.mixins import ORJSONBaseModel, UUIDMixin
+from core.mixins import ORJSONBaseModel, UUIDMixin
 
 
 class PersonResponse(UUIDMixin, ORJSONBaseModel):
@@ -13,8 +11,8 @@ class PersonDescriptionResponse(PersonResponse):
     """Данные по персоне.
     Для ручки /api/v1/persons/<uuid:UUID>/
     """
-    role: List[str]
-    film_ids: List[str]
+    role: list[str]
+    film_ids: list[str]
 
 
 class FilmPersonResponse(ORJSONBaseModel):

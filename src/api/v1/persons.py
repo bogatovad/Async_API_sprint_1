@@ -1,10 +1,10 @@
 from http import HTTPStatus
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
-
-from models.api.film import FilmResponse
-from models.api.person import PersonDescriptionResponse
+from fastapi import Query
+from api.v1.models.film import FilmResponse
+from api.v1.models.person import PersonDescriptionResponse
+from fastapi import APIRouter, Depends, HTTPException
 from services.person import PersonService, get_person_service
 
 router = APIRouter()
