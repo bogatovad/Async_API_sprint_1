@@ -4,13 +4,14 @@ services:
       image: bogatovartemz/etl:0.0.1
       command: python3 main.py
       depends_on:
-        - "postgres"
-        - "elasticsearch"
+        - postgres
+        - elasticsearch
 
     fastapi:
       build: src
       depends_on:
         - redis
+        - elasticsearch
       volumes:
         - ./src:/fastapi
       ports:
