@@ -8,14 +8,8 @@ from fastapi import Depends
 from core.config import settings
 from db.elastic import get_elastic
 from db.redis import get_redis
-<<<<<<< HEAD
-from models.services.film import FilmShort
-from models.services.person import PersonDescription
-=======
-from fastapi import Depends
 from models.film import FilmShort
 from models.person import PersonDescription
->>>>>>> main
 from services.cache_backend import RedisCache
 from services.paginator import Paginator
 from services.utils import es_search_template

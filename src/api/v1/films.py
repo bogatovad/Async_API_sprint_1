@@ -1,14 +1,10 @@
 from http import HTTPStatus
 from typing import List, Optional
 
-from fastapi import Query
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 
-from fastapi import Path
-
-from core.messages import ErrorMessage
 from api.v1.models.film import FilmDescriptionResponse, FilmResponse
-
-from fastapi import APIRouter, Depends, HTTPException
+from core.messages import ErrorMessage
 from services.film import FilmService, get_film_service
 
 router = APIRouter()
@@ -67,12 +63,12 @@ async def film_details(film_id: str, film_service: FilmService = Depends(get_fil
     response_description='Список фильмов на главной странице'
 )
 async def list_films(
-     page_size: Optional[int] = Query(1, alias='page[size]', description='Items amount on page', ge=1),
-     page_number: Optional[int] = Query(10, alias='page[number]', description='Page number for pagination', ge=1),
-     sort: Optional[str] = Query('imdb_rating', description='Field for sorting.'),
-     filter_genre: Optional[str] = Query('',  alias="filter[genre]", description='Field for filtering.'),
-     film_service: FilmService = Depends(get_film_service),
- ) -> List[FilmResponse]:
+    page_size: Optional[int] = Query(1, alias='page[size]', description='Items amount on page', ge=1),
+    page_number: Optional[int] = Query(10, alias='page[number]', description='Page number for pagination', ge=1),
+    sort: Optional[str] = Query('imdb_rating', description='Field for sorting.'),
+    filter_genre: Optional[str] = Query('',  alias="filter[genre]", description='Field for filtering.'),
+    film_service: FilmService = Depends(get_film_service),
+) -> List[FilmResponse]:
     query_params = dict(
         page_size=page_size,
         page_number=page_number,

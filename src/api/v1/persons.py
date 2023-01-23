@@ -1,12 +1,10 @@
 from http import HTTPStatus
 from typing import List, Optional
 
-from fastapi import Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 
-from fastapi import APIRouter, Depends, HTTPException
 from api.v1.models.film import FilmResponse
 from api.v1.models.person import PersonDescriptionResponse
-
 from core.messages import ErrorMessage
 from services.person import PersonService, get_person_service
 
