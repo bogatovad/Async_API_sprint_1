@@ -3,8 +3,8 @@ from http import HTTPStatus
 from fastapi import Request
 
 from fastapi import APIRouter, Depends, HTTPException
-from models.api.film import FilmResponse
-from models.api.person import PersonDescriptionResponse
+from api.v1.models.film import FilmResponse
+from api.v1.models.person import PersonDescriptionResponse
 
 from core.messages import ErrorMessage
 from services.person import PersonService, get_person_service

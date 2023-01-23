@@ -3,7 +3,7 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends, HTTPException
 
 from core.messages import ErrorMessage
-from models.api.genre import GenreResponse
+from api.v1.models.genre import GenreResponse
 from services.genre import GenreService, get_genre_service
 
 router = APIRouter()
