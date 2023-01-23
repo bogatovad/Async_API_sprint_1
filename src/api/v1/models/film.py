@@ -1,5 +1,6 @@
 from api.v1.models.person import FilmPersonResponse
 from core.mixins import ORJSONBaseModel, UUIDMixin
+from typing import Optional
 
 
 class FilmResponse(UUIDMixin, ORJSONBaseModel):
