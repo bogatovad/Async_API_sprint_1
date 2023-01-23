@@ -2,8 +2,8 @@ from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from core.messages import ErrorMessage
 from api.v1.models.genre import GenreResponse
+from core.messages import ErrorMessage
 from services.genre import GenreService, get_genre_service
 
 router = APIRouter()

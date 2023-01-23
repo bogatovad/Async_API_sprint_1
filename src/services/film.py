@@ -4,11 +4,11 @@ from functools import lru_cache
 
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch, NotFoundError
+from fastapi import Depends
 
 from core.config import settings
 from db.elastic import get_elastic
 from db.redis import get_redis
-from fastapi import Depends
 from models.film import Film
 from services.cache_backend import RedisCache
 from services.paginator import Paginator
@@ -95,6 +95,7 @@ class FilmService(Paginator, RedisCache):
 
         if not loads_movies:
             loads_movies = await self.paginator(self.index, body, page)
+            print("loads_movies!!", loads_movies, body)
             value = self.create_value(loads_movies)
             await self.set_to_cache(key_movies_search, value, settings.FILM_CACHE_EXPIRE_IN_SECONDS)
         return [Film(**movie['_source']) for movie in loads_movies]
