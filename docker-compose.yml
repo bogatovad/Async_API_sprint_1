@@ -27,7 +27,7 @@ services:
       env_file:
         - envs/.env
       expose:
-        - 9200
+        - 5432
 
     elasticsearch:
       image: elasticsearch:8.5.3
