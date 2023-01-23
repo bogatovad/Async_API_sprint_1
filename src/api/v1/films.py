@@ -17,8 +17,8 @@ router = APIRouter()
     response_description='Список фильмов на главной странице'
 )
 async def search_films(
-        page_size: Optional[int] = Query(1, alias='page[size]', description='Items amount on page', ge=1),
-        page_number: Optional[int] = Query(10, alias='page[number]', description='Page number for pagination', ge=1),
+        page_size: Optional[int] = Query(10, alias='page[size]', description='Items amount on page', ge=1),
+        page_number: Optional[int] = Query(1, alias='page[number]', description='Page number for pagination', ge=1),
         query: Optional[str] = Query('', description='Search string for query.'),
         sort: Optional[str] = Query('imdb_rating', description='Field for sorting.'),
         film_service: FilmService = Depends(get_film_service)) -> List[FilmResponse]:
@@ -63,8 +63,8 @@ async def film_details(film_id: str, film_service: FilmService = Depends(get_fil
     response_description='Список фильмов на главной странице'
 )
 async def list_films(
-    page_size: Optional[int] = Query(1, alias='page[size]', description='Items amount on page', ge=1),
-    page_number: Optional[int] = Query(10, alias='page[number]', description='Page number for pagination', ge=1),
+    page_size: Optional[int] = Query(10, alias='page[size]', description='Items amount on page', ge=1),
+    page_number: Optional[int] = Query(1, alias='page[number]', description='Page number for pagination', ge=1),
     sort: Optional[str] = Query('imdb_rating', description='Field for sorting.'),
     filter_genre: Optional[str] = Query('',  alias="filter[genre]", description='Field for filtering.'),
     film_service: FilmService = Depends(get_film_service),

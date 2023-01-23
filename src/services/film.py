@@ -95,6 +95,7 @@ class FilmService(Paginator, RedisCache):
 
         if not loads_movies:
             loads_movies = await self.paginator(self.index, body, page)
+            print("loads_movies!!", loads_movies, body)
             value = self.create_value(loads_movies)
             await self.set_to_cache(key_movies_search, value, settings.FILM_CACHE_EXPIRE_IN_SECONDS)
         return [Film(**movie['_source']) for movie in loads_movies]

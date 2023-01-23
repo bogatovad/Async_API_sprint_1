@@ -18,8 +18,8 @@ router = APIRouter()
     response_description='Результат поиска'
 )
 async def search_persons(
-        page_size: Optional[int] = Query(1, alias='page[size]', description='Items amount on page', ge=1),
-        page_number: Optional[int] = Query(10, alias='page[number]', description='Page number for pagination', ge=1),
+        page_size: Optional[int] = Query(10, alias='page[size]', description='Items amount on page', ge=1),
+        page_number: Optional[int] = Query(1, alias='page[number]', description='Page number for pagination', ge=1),
         query: Optional[str] = Query('', description='Search string for query.'),
         person_service: PersonService = Depends(get_person_service)
 ) -> List[PersonDescriptionResponse]:
