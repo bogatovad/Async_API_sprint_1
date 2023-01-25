@@ -29,11 +29,9 @@ isort:
 fastapi-bash:
 	${BASE_COMMAND} fastapi /bin/bash
 
-tests-build:
-	docker-compose -f tests/functional/docker-compose.yml build
+tests:
+	${BASE_COMMAND} tests
 
-tests-up:
-	docker-compose -f tests/functional/docker-compose.yml up
+tests-bash:
+	${BASE_COMMAND} tests /bin/bash
 
-tests-down:
-	docker-compose -f tests/functional/docker-compose.yml down
