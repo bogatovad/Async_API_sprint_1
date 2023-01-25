@@ -1,14 +1,46 @@
 version: '3'
+
 services:
   fastapi:
-    build: ../../.
+    build: ../../src
     image: fastapi-image
-    ...
+    restart: always
+    container_name: fastapi
+    expose:
+      - 8000
+    depends_on:
+      - test_redis
+      - test_elasticsearch
+   
 
   tests:
-    image: fastapi-image
-    entrypoint: >
-      sh -c "pip install -r /tests/functional/requirements.txt
-      && python3 /tests/functional/utils/wait_for_es.py
-      && python3 /tests/functional/utils/wait_for_redis.py
-      && pytest /tests/functional/src"
+    build: .
+    container_name: tests
+    expose:
+      - 8000
+    depends_on:
+      - test_redis
+      - test_elasticsearch
+    #entrypoint: >
+    #  sh -c "pip install -r ./requirements.txt
+    #  && python3 ./wait_for_services.py
+    #  && pytest /tests/src"
+
+  test_redis:
+    image: redis:7-alpine
+    container_name: test_redis
+    restart: always
+
+  test_elasticsearch:
+    image: elasticsearch:8.5.3
+    restart: always
+    container_name: test_elastic
+    volumes:
+      - test_elastic_data:/usr/share/elasticsearch/data
+    expose:
+      - 9200
+    env_file:
+      - ../../envs/.env_elastic
+
+volumes:
+  test_elastic_data:
