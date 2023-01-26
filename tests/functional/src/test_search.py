@@ -22,7 +22,7 @@ from tests.functional.settings import test_settings
 @pytest.mark.asyncio
 async def test_search(es_write_data, query_data, expected_answer):
 
-    es_client = AsyncElasticsearch(hosts=test_settings.es_host,
+    es_client = AsyncElasticsearch(hosts=test_settings.ES_HOST,
                                    validate_cert=False,
                                    use_ssl=False)
     response = await es_client.bulk(str_query, refresh=True)

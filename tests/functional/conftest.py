@@ -7,7 +7,7 @@ import datetime
 
 
 @pytest.fixture
-async def get_es_bulk_query(data, es_index=test_settings.es_index, es_id_field=test_settings.es_id_field) -> list:
+async def get_es_bulk_query() -> list:
     es_data = [{
         'id': str(uuid.uuid4()),
         'imdb_rating': 8.5,
@@ -33,7 +33,7 @@ async def get_es_bulk_query(data, es_index=test_settings.es_index, es_id_field=t
     bulk_query = []
     for row in es_data:
         bulk_query.extend([
-            json.dumps({'index': {'_index': test_settings.es_index, '_id': row[test_settings.es_id_field]}}),
+            json.dumps({'index': {'_index': test_settings.MOVIES_INDEX, '_id': row[test_settings.ES_ID_FIELD]}}),
             json.dumps(row)
         ])
     return bulk_query
@@ -43,11 +43,11 @@ async def get_es_bulk_query(data, es_index=test_settings.es_index, es_id_field=t
 def es_write_data():
     async def inner(data: list[dict]):
 
-        bulk_query = await get_es_bulk_query(data, test_settings.es_index, test_settings.es_id_field)
+        bulk_query = await get_es_bulk_query()
         str_query = '\n'.join(bulk_query) + '\n'
 
         es_client = AsyncElasticsearch(
-            hosts=test_settings.es_host, validate_cert=False, use_ssl=False
+            hosts=test_settings.ES_HOST, validate_cert=False, use_ssl=False
         )
         response = await es_client.bulk(str_query, refresh=True)
         await es_client.close()
