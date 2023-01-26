@@ -2,7 +2,7 @@ FROM python:3.10.8-slim-bullseye
 
 RUN pip install --upgrade pip
 
-WORKDIR /tests
+WORKDIR /tests/functional
 RUN groupadd -r tests && useradd -d /tests -r -g tests tests
 
 COPY requirements.txt requirements.txt
@@ -12,4 +12,4 @@ COPY . .
 RUN chown tests:tests -R /tests
 
 USER tests
-CMD python3 functional/utils/wait_for_es.py && python3 functional/utils/wait_for_redis.py && pytest functional/src
+CMD python3 utils/wait_for_es.py && python3 utils/wait_for_redis.py && pytest src
