@@ -1,9 +1,19 @@
 version: '3'
 
+
 services:
   fastapi:
     build: ../../src
+    build: ../../src
     image: fastapi-image
+    restart: always
+    container_name: fastapi
+    expose:
+      - 8000
+    depends_on:
+      - test_redis
+      - test_elasticsearch
+   
     restart: always
     container_name: fastapi
     expose:
@@ -21,10 +31,6 @@ services:
     depends_on:
       - test_redis
       - test_elasticsearch
-    #entrypoint: >
-    #  sh -c "pip install -r ./requirements.txt
-    #  && python3 ./wait_for_services.py
-    #  && pytest /tests/src"
 
   test_redis:
     image: redis:7-alpine
