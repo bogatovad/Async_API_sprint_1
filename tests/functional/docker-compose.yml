@@ -1,20 +1,13 @@
 version: '3'
 services:
-  fastapi:
-    build: ../../src
-    image: fastapi-image
-
   tests:
-    image: fastapi-image
-    entrypoint: >
-      sh -c "pip install -r /tests/functional/requirements.txt
-      && python3 /tests/functional/utils/wait_for_es.py
-      && python3 /tests/functional/utils/wait_for_redis.py
-      && pytest /tests/functional/src"
+    build: .
     depends_on:
       - elastic_test
       - redis_test
     restart: always
+    volumes:
+      - ./:/functional
 
   elastic_test:
     image: elasticsearch:8.5.3

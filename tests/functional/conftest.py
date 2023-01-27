@@ -1,13 +1,13 @@
 import pytest
 from elasticsearch import AsyncElasticsearch
-from settings import test_settings
+from .settings import test_settings
 import json
 import uuid
 import datetime
 
 
 @pytest.fixture
-async def get_es_bulk_query() -> list:
+def get_es_bulk_query() -> list:
     es_data = [{
         'id': str(uuid.uuid4()),
         'imdb_rating': 8.5,
