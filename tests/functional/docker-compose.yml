@@ -9,8 +9,7 @@ services:
     volumes:
       - ./:/functional
     entrypoint: >
-      sh -c "python3 utils/wait_for_es.py
-      && python3 utils/wait_for_redis.py
+      sh -c "python3 ./wait_for_services.py
       && pytest /src"  
 
   elastic_test:

@@ -1,4 +1,13 @@
+import backoff
 from pydantic import BaseSettings, Field
+
+
+backoff_config = {
+    'wait_gen': backoff.expo,
+    'exception': Exception,
+    'max_tries': 3600,
+    'raise_on_giveup': False
+}
 
 
 class TestSettings(BaseSettings):
