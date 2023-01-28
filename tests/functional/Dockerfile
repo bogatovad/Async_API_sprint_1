@@ -1,5 +1,8 @@
 FROM python:3.10.8-slim-bullseye
 
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
 RUN pip install --upgrade pip
 
 WORKDIR /functional
@@ -12,4 +15,3 @@ COPY . .
 RUN chown tests:tests -R /functional
 
 USER tests
-CMD python3 utils/wait_for_es.py && python3 utils/wait_for_redis.py && pytest src

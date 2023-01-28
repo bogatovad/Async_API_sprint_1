@@ -5,9 +5,13 @@ services:
     depends_on:
       - elastic_test
       - redis_test
-    restart: always
+    #restart: always
     volumes:
       - ./:/functional
+    entrypoint: >
+      sh -c "python3 utils/wait_for_es.py
+      && python3 utils/wait_for_redis.py
+      && pytest /src"  
 
   elastic_test:
     image: elasticsearch:8.5.3
