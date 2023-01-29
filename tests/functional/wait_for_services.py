@@ -16,22 +16,22 @@ def ping_redis():
     )
     while True:
         if redis_client.ping():
-            break
+            return
         time.sleep(1)
 
 
 @backoff.on_exception(**backoff_config)
 def ping_es():
-    es_client =Elasticsearch(f'http://{test_settings.ELASIC_HOST}:{test_settings.ELASTIC_PORT}', 
+    es_client = Elasticsearch(f'http://{test_settings.ES_HOST}:{test_settings.ES_PORT}',
         validate_cert=False,
         use_ssl=False
     )
     while True:
         if es_client.ping():
-            break
+            return
         time.sleep(1)
 
 
 if __name__ == '__main__':
-    ping_redis()
     ping_es()
+    ping_redis()
