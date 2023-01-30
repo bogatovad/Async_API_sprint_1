@@ -1,0 +1,38 @@
+version: '3'
+services:
+  tests:
+    build: .
+    depends_on:
+      - elastic_test
+      - redis_test
+    container_name: tests
+    volumes:
+      - ./:/functional
+    entrypoint: >
+      sh -c "python3 ./wait_for_services.py
+      && pytest"
+    ports:
+      - '8000:8000'
+    env_file:
+      - ../../envs/.env
+
+  elastic_test:
+    image: elasticsearch:8.5.3
+    restart: always
+    container_name: elasticsearch
+    env_file:
+      - ../../envs/.env_elastic
+    volumes:
+     - test_elastic_data:/usr/share/elasticsearch/data
+    ports:
+      - '9200:9200'
+
+  redis_test:
+    image: redis:7-alpine
+    restart: always
+    container_name: redis
+    ports:
+      - '6379:6379'
+    
+volumes:
+  test_elastic_data:

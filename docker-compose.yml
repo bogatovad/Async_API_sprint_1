@@ -48,6 +48,27 @@ services:
       ports:
         - "80:80"
 
+    tests:
+      build: tests/functional
+      depends_on:
+        - elastic_test
+        - redis_test
+      volumes:
+        - ./tests:/tests
+      env_file:
+        - envs/.env_elastic
+
+    elastic_test:
+      image: elasticsearch:8.5.3
+      expose:
+        - 9200
+      env_file:
+        - envs/.env_elastic
+
+    redis_test:
+      image: redis:7-alpine
+      restart: always
+
 volumes:
   data_postgres:
   data_elasticsearch:
