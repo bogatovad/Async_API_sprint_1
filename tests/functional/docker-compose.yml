@@ -1,0 +1,21 @@
+version: '3'
+services:
+  tests:
+    build: .
+    depends_on:
+      - elastic_test
+      - redis_test
+    restart: always
+    volumes:
+      - ./:/functional
+
+  elastic_test:
+    image: elasticsearch:8.5.3
+    expose:
+      - 9200
+    env_file:
+      - ../../envs/.env_elastic
+
+  redis_test:
+    image: redis:7-alpine
+    restart: always

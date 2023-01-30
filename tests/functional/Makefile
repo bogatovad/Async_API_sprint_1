@@ -1,6 +1,6 @@
 #!make
 
-include envs/.env
+include ../../envs/.env
 BASE_COMMAND = docker-compose run --rm
 COMMAND = ${BASE_COMMAND}  /bin/bash -c
 COMPOSE = docker-compose

@@ -48,6 +48,7 @@ services:
       ports:
         - "80:80"
 
+
 volumes:
   data_postgres:
   data_elasticsearch:

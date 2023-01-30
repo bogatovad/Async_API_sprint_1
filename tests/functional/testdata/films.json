@@ -1,0 +1,374 @@
+[
+    {
+        "_index": "movies",
+        "_id": "0aad2df4-9afc-4592-8614-f37da9319ad0",
+        "_score": 1.0,
+        "_source": {
+            "id": "0aad2df4-9afc-4592-8614-f37da9319ad0",
+            "imdb_rating": 5.7,
+            "genre": [
+                "Drama"
+            ],
+            "title": "Star Spangled Banners",
+            "description": "In their late teens and early 20's, the Banner siblings - Mitchell, Desiree and Danny - made it big as a rock group, but at the height of their fame, Desiree decided to leave the group, and everything fell apart. Now, fifteen years later, their mother has a plan to bring the group back together and heal her family. But will the siblings be able to put aside their differences and reunite, or will they remain estranged forever?",
+            "director": [
+                "Don McBrearty"
+            ],
+            "actors_names": [
+                "Brooke White",
+                "Christian Campbell",
+                "Mercedes Ruehl",
+                "Michael Barbuto"
+            ],
+            "writers_names": [
+                "Michael Vickerman"
+            ],
+            "actors": [
+                {
+                    "id": "4049bf14-beed-48e8-bdb8-d45ab3bf4f31",
+                    "name": "Brooke White"
+                },
+                {
+                    "id": "8f7acf60-a23b-4d48-ae6e-6d7813ab11ce",
+                    "name": "Christian Campbell"
+                },
+                {
+                    "id": "cbedbeec-0c34-402a-8947-accdfa65c20c",
+                    "name": "Michael Barbuto"
+                },
+                {
+                    "id": "ebe440b4-15ec-45bb-9c4f-6ccb667059e6",
+                    "name": "Mercedes Ruehl"
+                }
+            ],
+            "writers": [
+                {
+                    "id": "ee0b244a-a430-4be4-aa30-d5bd438e457f",
+                    "name": "Michael Vickerman"
+                }
+            ]
+        }
+    },
+    {
+        "_index": "movies",
+        "_id": "12fa1213-c3de-4b62-a3b6-8c939e2addcf",
+        "_score": 1.0,
+        "_source": {
+            "id": "12fa1213-c3de-4b62-a3b6-8c939e2addcf",
+            "imdb_rating": 5.8,
+            "genre": [
+                "Crime",
+                "Drama",
+                "Horror",
+                "Mystery",
+                "Thriller"
+            ],
+            "title": "Star Time",
+            "description": "A delusional misfit becomes suicidal when his favorite TV show is cancelled. An agent promises to make him a TV star if he kills certain people, so he becomes \"The Baby Mask Killer.\"",
+            "director": [
+                "Alexander Cassini"
+            ],
+            "actors_names": [
+                "Dana Dantine",
+                "John P. Ryan",
+                "Maureen Teefy",
+                "Michael St. Gerard"
+            ],
+            "writers_names": [
+                "Alexander Cassini"
+            ],
+            "actors": [
+                {
+                    "id": "679a0d87-e972-4020-83c8-ee76e70a39a4",
+                    "name": "Dana Dantine"
+                },
+                {
+                    "id": "905c0e95-330f-4577-8d9a-bb78a3fc1ab9",
+                    "name": "John P. Ryan"
+                },
+                {
+                    "id": "ab2d0230-b6c1-4718-9790-7a5cf271f94f",
+                    "name": "Michael St. Gerard"
+                },
+                {
+                    "id": "efc638d0-10b5-475f-a806-e19dc43417d4",
+                    "name": "Maureen Teefy"
+                }
+            ],
+            "writers": [
+                {
+                    "id": "07d7d411-0928-40e2-8b5e-c8d267fbc206",
+                    "name": "Alexander Cassini"
+                }
+            ]
+        }
+    },
+    {
+        "_index": "movies",
+        "_id": "31935df4-a583-4059-8b09-53791ac182b4",
+        "_score": 1.0,
+        "_source": {
+            "id": "31935df4-a583-4059-8b09-53791ac182b4",
+            "imdb_rating": 6.9,
+            "genre": [
+                "Music",
+                "Reality-TV"
+            ],
+            "title": "Rock Star: INXS",
+            "description": "Reality competition show looking for a new lead singer for the rock group INXS",
+            "director": [],
+            "actors_names": [
+                "Paul Mirkovich"
+            ],
+            "writers_names": null,
+            "actors": [
+                {
+                    "id": "89924de1-456d-4d06-97f9-ba6afc41c7c9",
+                    "name": "Paul Mirkovich"
+                }
+            ],
+            "writers": []
+        }
+    },
+    {
+        "_index": "movies",
+        "_id": "3345b33d-5c30-49ec-8aeb-d5b5039c317b",
+        "_score": 1.0,
+        "_source": {
+            "id": "3345b33d-5c30-49ec-8aeb-d5b5039c317b",
+            "imdb_rating": 7.1,
+            "genre": [
+                "Biography",
+                "Drama"
+            ],
+            "title": "Hebe: The Brazilian Star",
+            "description": "A recollection of Hebe Camargo's life during the '80s, a time when she struggled between a personal and professional crisis and decided to take control of her own career.",
+            "director": [
+                "Maurício Farias"
+            ],
+            "actors_names": [
+                "Andrea Beltrão",
+                "Otávio Augusto",
+                "Renata Bastos",
+                "Rodrigo Arijon"
+            ],
+            "writers_names": [
+                "Carolina Kotscho"
+            ],
+            "actors": [
+                {
+                    "id": "03bc4503-a260-4137-8a1a-de9c221b8f82",
+                    "name": "Otávio Augusto"
+                },
+                {
+                    "id": "0f717fe7-8185-4d12-b75a-22298700e9c7",
+                    "name": "Andrea Beltrão"
+                },
+                {
+                    "id": "5a3f3b04-feb8-4c35-a2a6-5e8ef8ae90f6",
+                    "name": "Renata Bastos"
+                },
+                {
+                    "id": "9e269515-c0ff-463f-8728-975118ade232",
+                    "name": "Rodrigo Arijon"
+                }
+            ],
+            "writers": [
+                {
+                    "id": "dd933227-b951-4942-999a-c52f73bf7b20",
+                    "name": "Carolina Kotscho"
+                }
+            ]
+        }
+    },
+    {
+        "_index": "movies",
+        "_id": "355ec912-9e1d-4c4c-9a46-0d7b7fe4de75",
+        "_score": 1.0,
+        "_source": {
+            "id": "355ec912-9e1d-4c4c-9a46-0d7b7fe4de75",
+            "imdb_rating": 6.8,
+            "genre": [
+                "Romance"
+            ],
+            "title": "Be My Star",
+            "description": "A girl's everyday life at the end of her school days, trying to find a way into society and her own life.",
+            "director": [
+                "Valeska Grisebach"
+            ],
+            "actors_names": [
+                "Christopher Schöps",
+                "Jeanine Gläser",
+                "Monique Gläser",
+                "Nicole Gläser"
+            ],
+            "writers_names": [
+                "Valeska Grisebach"
+            ],
+            "actors": [
+                {
+                    "id": "11077206-1f0b-4e1c-9043-fed191874125",
+                    "name": "Monique Gläser"
+                },
+                {
+                    "id": "224b3f66-c5e4-4139-9357-d0233b373ed1",
+                    "name": "Jeanine Gläser"
+                },
+                {
+                    "id": "abde4d73-0d47-49d4-8f29-0706cbe489d3",
+                    "name": "Christopher Schöps"
+                },
+                {
+                    "id": "e1145228-e3fa-47fb-b2f7-75fcea37f3bc",
+                    "name": "Nicole Gläser"
+                }
+            ],
+            "writers": [
+                {
+                    "id": "5cb97fc7-339a-4902-9ae3-8eda74794df9",
+                    "name": "Valeska Grisebach"
+                }
+            ]
+        }
+    },
+    {
+        "_index": "movies",
+        "_id": "38c27677-21c8-4dfe-b610-f96a4bb905ed",
+        "_score": 1.0,
+        "_source": {
+            "id": "38c27677-21c8-4dfe-b610-f96a4bb905ed",
+            "imdb_rating": 8.0,
+            "genre": [
+                "Documentary",
+                "Western"
+            ],
+            "title": "Lone Star Law",
+            "description": "\"Lone Star Law\" features the men and women of the Texas Game Wardens who protect more than a quarter-million square miles of deserts, lakes, piney woods, bayous, plains and coast in the second-largest state in the U.S. Whether rushing to investigate poaching cases, save flash-flood victims, disrupt illegal smuggling rings, or rescue injured wildlife, the officers are always on the go, defending both animals and citizens. Animal Planet expands its family of wildlife law enforcement series, adding to Maine's \"North Woods Law\" an offering that follows an elite patrol force in Texas.",
+            "director": [],
+            "actors_names": [
+                "Rider"
+            ],
+            "writers_names": null,
+            "actors": [
+                {
+                    "id": "7b99802b-b8ca-4051-b717-1775a9771053",
+                    "name": "Rider"
+                }
+            ],
+            "writers": []
+        }
+    },
+    {
+        "_index": "movies",
+        "_id": "416a4645-f6d4-4b71-8808-b6995bdc15f3",
+        "_score": 1.0,
+        "_source": {
+            "id": "416a4645-f6d4-4b71-8808-b6995bdc15f3",
+            "imdb_rating": 7.3,
+            "genre": [
+                "Documentary",
+                "Family",
+                "History"
+            ],
+            "title": "The Star of Bethlehem",
+            "description": "\"We saw His star in the east and we have come to worship Him\" (Matthew 2:2) The biblical report in the Gospel of Matthew tells a story of wise men reporting to Herod about a \"King\" born ...",
+            "director": [
+                "Stephen Vidano"
+            ],
+            "actors_names": null,
+            "writers_names": [
+                "Frederick A. Larson"
+            ],
+            "actors": [],
+            "writers": [
+                {
+                    "id": "6c2d00c8-a927-44b8-af78-38aa59b28b4d",
+                    "name": "Frederick A. Larson"
+                }
+            ]
+        }
+    },
+    {
+        "_index": "movies",
+        "_id": "47ac08a1-7726-414a-a325-924e8a9a9945",
+        "_score": 1.0,
+        "_source": {
+            "id": "47ac08a1-7726-414a-a325-924e8a9a9945",
+            "imdb_rating": 5.2,
+            "genre": [
+                "Sci-Fi"
+            ],
+            "title": "Star Wars City",
+            "description": null,
+            "director": [],
+            "actors_names": null,
+            "writers_names": null,
+            "actors": [],
+            "writers": []
+        }
+    },
+    {
+        "_index": "movies",
+        "_id": "4916fd42-fef2-479e-bd0e-85e1198e5e38",
+        "_score": 1.0,
+        "_source": {
+            "id": "4916fd42-fef2-479e-bd0e-85e1198e5e38",
+            "imdb_rating": 7.2,
+            "genre": [
+                "Sci-Fi"
+            ],
+            "title": "Star Trek",
+            "description": null,
+            "director": [],
+            "actors_names": null,
+            "writers_names": null,
+            "actors": [],
+            "writers": []
+        }
+    },
+    {
+        "_index": "movies",
+        "_id": "5353633e-bd6d-4e6d-b284-918d66e5848f",
+        "_score": 1.0,
+        "_source": {
+            "id": "5353633e-bd6d-4e6d-b284-918d66e5848f",
+            "imdb_rating": 7.7,
+            "genre": [
+                "Comedy",
+                "Music",
+                "Short"
+            ],
+            "title": "Smash Mouth: All Star",
+            "description": "Music video for Smash Mouth's song, 'All Star'.",
+            "director": [
+                "McG"
+            ],
+            "actors_names": [
+                "Dane Cook",
+                "Greg Camp",
+                "Hank Azaria",
+                "Paul De Lisle"
+            ],
+            "writers_names": null,
+            "actors": [
+                {
+                    "id": "3a2575a6-4f08-41dc-add3-d38a17ee2b85",
+                    "name": "Greg Camp"
+                },
+                {
+                    "id": "af090823-64ae-4fcb-813c-5f7ffc4d8b15",
+                    "name": "Paul De Lisle"
+                },
+                {
+                    "id": "c21e8f21-c412-4a76-bcd2-b82f48c1e669",
+                    "name": "Dane Cook"
+                },
+                {
+                    "id": "c926c431-4931-4123-90ef-05f203784538",
+                    "name": "Hank Azaria"
+                }
+            ],
+            "writers": []
+        }
+    }
+]
