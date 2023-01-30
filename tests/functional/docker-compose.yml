@@ -10,9 +10,9 @@ services:
       - ./:/functional
 
   elastic_test:
-    image: elasticsearch:8.5.3
-    expose:
-      - 9200
+    image: elasticsearch:7.9.1
+    ports:
+      - 9200:9200
     env_file:
       - ../../envs/.env_elastic
 
