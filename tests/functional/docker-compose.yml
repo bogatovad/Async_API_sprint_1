@@ -1,21 +1,37 @@
 version: '3'
-services:
-  tests:
-    build: .
-    depends_on:
-      - elastic_test
-      - redis_test
-    restart: always
-    volumes:
-      - ./:/functional
 
-  elastic_test:
-    image: elasticsearch:7.9.1
-    ports:
-      - 9200:9200
+services:
+  fastapi:
+    build:
+      context: ../../../Async_API_sprint_1
+    image: fastapi-image
+    depends_on:
+      - redis
+      - elasticsearch
+
+  tests:
+    image: fastapi-image
+    volumes:
+      - ../../../Async_API_sprint_1/tests:/fastapi/tests
+    entrypoint: >
+      sh -c "ls /fastapi/tests &&
+      pip install -r /fastapi/tests/functional/requirements.txt
+      && python3 /fastapi/tests/functional/utils/wait_for_es.py
+      && pytest /fastapi/tests/functional/src"
+
+  redis:
+    image: redis:7-alpine
+
+  postgres:
+    image: postgres:13.0-alpine
+    env_file:
+      - ../../envs/.env
+    expose:
+      - 5432
+
+  elasticsearch:
+    image: elasticsearch:8.5.3
+    expose:
+      - 9200
     env_file:
       - ../../envs/.env_elastic
-
-  redis_test:
-    image: redis:7-alpine
-    restart: always

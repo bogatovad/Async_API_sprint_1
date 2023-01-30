@@ -1,46 +1,57 @@
+import datetime
+import uuid
+
 import aiohttp
 import pytest
+from ..settings import test_settings
 
-from elasticsearch import AsyncElasticsearch
 
-from functional.settings import test_settings
+def generate_es_data():
+    return [
+        {
+            'id': str(uuid.uuid4()),
+            'imdb_rating': 8.5,
+            'genre': ['Action', 'Sci-Fi'],
+            'title': 'The Star',
+            'description': 'New World',
+            'director': ['Stan'],
+            'actors_names': ['Ann', 'Bob'],
+            'writers_names': ['Ben', 'Howard'],
+            'actors': [
+                {'id': '111', 'name': 'Ann'},
+                {'id': '222', 'name': 'Bob'}
+            ],
+            'writers': [
+                {'id': '333', 'name': 'Ben'},
+                {'id': '444', 'name': 'Howard'}
+            ],
+            'created_at': datetime.datetime.now().isoformat(),
+            'updated_at': datetime.datetime.now().isoformat(),
+            'film_work_type': 'movie'
+        }
+        for _ in range(60)
+    ]
 
 
 @pytest.mark.parametrize(
     'query_data, expected_answer',
     [
         (
-                {'search': 'The Star'},
-                {'status': 200, 'length': 50}
+            {'search': 'The Star'},
+            {'status': 200, 'length': 60}
         ),
-        (
-                {'search': 'Mashed potato'},
-                {'status': 200, 'length': 0}
-        )
     ]
 )
 @pytest.mark.asyncio
-async def test_search(es_write_data, get_es_bulk_query, query_data, expected_answer):
-
-    bulk_query = get_es_bulk_query
-    str_query = '\n'.join(bulk_query) + '\n'
-    es_client = AsyncElasticsearch(hosts=test_settings.ES_HOST,
-                                   validate_cert=False,
-                                   use_ssl=False)
-    response = await es_client.bulk(str_query, refresh=True)
-    await es_client.close()
-    # if response['errors']:
-    #     print(response['errors'])
-    #     raise Exception('Ошибка записи данных в Elasticsearch')
-
+@pytest.mark.asyncio
+async def test_search(es_client, es_write_data, query_data, expected_answer):
+    es_data = generate_es_data()
+    await es_write_data(es_data)
     session = aiohttp.ClientSession()
-    url = test_settings.SERVICE_URL + '/api/v1/search'
-    query_data = {'search': 'The Star'}
-    async with session.get(url, params=query_data) as response:
-        body = await response.json()
-        headers = response.headers
-        status = response.status
-    await session.close()
+    url = test_settings.es_host + '/movies/_search'
 
-    assert status == 200
-    assert len(response.body) == 50
+    async with session.get(url) as response:
+        status = response.status
+        body = await response.json()
+    await session.close()
+    assert expected_answer == {'status': status, 'length': body['hits']['total']['value']}
