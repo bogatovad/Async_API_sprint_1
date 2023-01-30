@@ -33,7 +33,7 @@ def es_write_data(es_client):
         response = await es_client.bulk(bulk_query, refresh=True)
         await es_client.close()
         if response['errors']:
-            raise Exception('Ошибка записи данных в Elasticsearch')
+            raise Exception(f'Ошибка записи данных в Elasticsearch')
     return inner
 
 
@@ -60,7 +60,9 @@ def generate_es_data():
             'writers_names': ['Ben', 'Howard'],
             'actors': [
                 {'id': '111', 'name': 'Ann'},
-                {'id': '222', 'name': 'Bob'}
+                {'id': '222', 'name': 'Bob'},
+                # {'id': '44', 'name': 'Petr Ivanov'}
+
             ],
             'writers': [
                 {'id': '333', 'name': 'Ben'},

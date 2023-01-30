@@ -2,7 +2,7 @@ from pydantic import BaseSettings, Field
 
 
 class TestSettings(BaseSettings):
-    es_host: str = Field('http://elasticsearch:9200', env='ELASTIC_HOST')
+    es_host: str = Field('http://elasticsearch:9200/', env='ELASTIC_HOST')
     es_index: str = 'persons'
     es_id_field: str = 'id'
     es_index_mapping: dict = {}
