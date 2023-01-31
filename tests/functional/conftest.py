@@ -61,8 +61,6 @@ def generate_es_data():
             'actors': [
                 {'id': '111', 'name': 'Ann'},
                 {'id': '222', 'name': 'Bob'},
-                # {'id': '44', 'name': 'Petr Ivanov'}
-
             ],
             'writers': [
                 {'id': '333', 'name': 'Ben'},

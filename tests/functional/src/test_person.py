@@ -2,7 +2,7 @@ import aiohttp
 import pytest
 
 from .indexes import index_to_schema
-from ..conftest import generate_es_data_person, generate_es_data
+from ..conftest import generate_es_data_person
 from ..settings import test_settings
 
 

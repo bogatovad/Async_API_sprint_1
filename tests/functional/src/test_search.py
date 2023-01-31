@@ -6,8 +6,6 @@ from ..conftest import generate_es_data, generate_es_data_person
 from ..settings import test_settings
 
 
-
-
 @pytest.mark.parametrize(
     'query_data, expected_answer',
     [
@@ -22,7 +20,7 @@ async def test_search_movies(es_client, es_write_data, query_data, expected_answ
     es_data = generate_es_data()
     await es_write_data(es_data, 'movies')
     session = aiohttp.ClientSession()
-    url = test_settings.es_host + '/movies/_search'
+    url = test_settings.es_host + 'movies/_search'
 
     async with session.get(url) as response:
         status = response.status
@@ -90,7 +88,7 @@ async def test_search_movies_filtering(es_client, es_write_data, query_data, exp
     ]
 )
 @pytest.mark.asyncio
-async def test_search_movies(es_client, es_write_data, query_data, expected_answer):
+async def test_search_movies_elastic(es_client, es_write_data, query_data, expected_answer):
     es_data = generate_es_data()
     await es_write_data(es_data, 'movies')
     session = aiohttp.ClientSession()
@@ -99,7 +97,6 @@ async def test_search_movies(es_client, es_write_data, query_data, expected_answ
     async with session.get(url) as response:
         status = response.status
         body = await response.json()
-        print(f'bod123y {body}')
 
     await session.close()
     assert expected_answer == {'status': status, 'length': body['hits']['total']['value']}
@@ -115,7 +112,7 @@ async def test_search_movies(es_client, es_write_data, query_data, expected_answ
     ]
 )
 @pytest.mark.asyncio
-async def test_search_persons(es_client, es_write_data, query_data, expected_answer):
+async def test_search_persons_elastic(es_client, es_write_data, query_data, expected_answer):
     es_data = generate_es_data_person()
     await es_write_data(es_data, 'persons')
     session = aiohttp.ClientSession()
@@ -127,6 +124,77 @@ async def test_search_persons(es_client, es_write_data, query_data, expected_ans
 
     await session.close()
     assert expected_answer == {'status': status, 'length': body['hits']['total']['value']}
+
+
+@pytest.mark.parametrize(
+    'query_data, expected_answer',
+    [
+        (
+            {'search': 'The Star'},
+            {'status': 200, 'length': 5}
+        ),
+    ]
+)
+@pytest.mark.asyncio
+async def test_search_persons(es_client, es_write_data, query_data, expected_answer):
+    for index in ("movies", "genres", "persons"):
+        data_create_index = {
+            "index": index,
+            "ignore": 400,
+            "body": index_to_schema.get(index)
+        }
+        await es_client.indices.create(
+            **data_create_index
+        )
+    es_data = generate_es_data_person()
+    await es_write_data(es_data, 'persons')
+    session = aiohttp.ClientSession()
+    url = test_settings.service_url + 'persons/search?query=Petr Ivanov&page[size]=5&page[index]=1'
+
+    async with session.get(url) as response:
+        status = response.status
+        body = await response.json()
+
+    assert expected_answer == {'status': status, 'length': len(body)}
+
+
+@pytest.mark.parametrize(
+    'query_data, expected_answer',
+    [
+        (
+            {'search': 'The Star'},
+            {'status': 200, 'length': 5}
+        ),
+    ]
+)
+@pytest.mark.asyncio
+async def test_search_persons_cache(es_client, es_write_data, query_data, expected_answer):
+    for index in ("movies", "genres", "persons"):
+        data_create_index = {
+            "index": index,
+            "ignore": 400,
+            "body": index_to_schema.get(index)
+        }
+        await es_client.indices.create(
+            **data_create_index
+        )
+    es_data = generate_es_data_person()
+    await es_write_data(es_data, 'persons')
+    session = aiohttp.ClientSession()
+
+    # Проверим кэш перед запросом.
+
+    # Делаем первый раз запрос.
+    url = test_settings.service_url + 'persons/search?query=Petr Ivanov&page[size]=5&page[index]=1'
+
+    async with session.get(url) as response:
+        status = response.status
+        body = await response.json()
+
+    # Проверяем кэш.
+
+    assert expected_answer == {'status': status, 'length': len(body)}
+
 
 
 
