@@ -22,7 +22,7 @@ async def test_search_movies(es_client, es_write_data, query_data, expected_answ
     es_data = generate_es_data()
     await es_write_data(es_data, 'movies')
     session = aiohttp.ClientSession()
-    url = test_settings.es_host + '/movies/_search'
+    url = test_settings.ES_HOST + '/movies/_search'
 
     async with session.get(url) as response:
         status = response.status
@@ -46,7 +46,7 @@ async def test_search_movies_paginator(es_client, es_write_data, query_data, exp
     es_data = generate_es_data()
     await es_write_data(es_data, 'movies')
     session = aiohttp.ClientSession()
-    url = test_settings.service_url + 'films?page[number]=1&page[size]=5'
+    url = test_settings.SERVICE_URL + 'films?page[number]=1&page[size]=5'
     async with session.get(url) as response:
         status = response.status
         body = await response.json()
@@ -72,7 +72,7 @@ async def test_search_movies_filtering(es_client, es_write_data, query_data, exp
     es_data = generate_es_data()
     await es_write_data(es_data, 'movies')
     session = aiohttp.ClientSession()
-    url = test_settings.service_url + 'films?filter[genre]=Sci-Fi'
+    url = test_settings.SERVICE_URL + 'films?filter[genre]=Sci-Fi'
     async with session.get(url) as response:
         status = response.status
         body = await response.json()
@@ -94,7 +94,7 @@ async def test_search_movies(es_client, es_write_data, query_data, expected_answ
     es_data = generate_es_data()
     await es_write_data(es_data, 'movies')
     session = aiohttp.ClientSession()
-    url = test_settings.es_host + 'movies/_search'
+    url = test_settings.ES_HOST + 'movies/_search'
 
     async with session.get(url) as response:
         status = response.status
@@ -119,7 +119,7 @@ async def test_search_persons(es_client, es_write_data, query_data, expected_ans
     es_data = generate_es_data_person()
     await es_write_data(es_data, 'persons')
     session = aiohttp.ClientSession()
-    url = test_settings.es_host + 'persons/_search'
+    url = test_settings.ES_HOST + 'persons/_search'
 
     async with session.get(url) as response:
         status = response.status

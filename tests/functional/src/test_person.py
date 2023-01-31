@@ -31,13 +31,13 @@ async def test_get_person(es_client, es_write_data, query_data, expected_answer)
     await es_write_data(es_data, 'persons')
     session = aiohttp.ClientSession()
 
-    url_es = test_settings.es_host + 'persons/_search'
+    url_es = test_settings.ES_HOST + 'persons/_search'
 
     async with session.get(url_es) as response:
         body = await response.json()
         uuid_person = body['hits']['hits'][0]['_id']
 
-    url = test_settings.service_url + f'persons/{uuid_person}'
+    url = test_settings.SERVICE_URL + f'persons/{uuid_person}'
 
     async with session.get(url) as response:
         body = await response.json()

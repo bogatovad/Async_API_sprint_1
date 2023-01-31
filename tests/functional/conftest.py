@@ -29,7 +29,7 @@ def get_es_bulk_query(es_data, es_index, es_id_field):
 @pytest.fixture
 def es_write_data(es_client):
     async def inner(data: list[dict], es_index: str):
-        bulk_query = get_es_bulk_query(data, es_index, test_settings.es_id_field)
+        bulk_query = get_es_bulk_query(data, es_index, test_settings.ES_ID_FIELD)
         response = await es_client.bulk(bulk_query, refresh=True)
         await es_client.close()
         if response['errors']:
