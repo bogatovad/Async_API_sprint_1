@@ -3,7 +3,8 @@ from pydantic import BaseSettings, Field
 
 class TestSettings(BaseSettings):
     ES_HOST: str = Field('http://elasticsearch:9200/', env='ELASTIC_HOST')
-    ES_INDEX: str = 'persons'
+    ES_PERSONS_INDEX: str = 'persons'
+    ES_MOVIES_INDEX: str = 'movies'
     ES_ID_FIELD: str = 'id'
     ES_INDEX_MAPPING: dict = {}
 
