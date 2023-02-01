@@ -1,12 +1,11 @@
-import pytest
 import http
-from .indexes import index_to_schema
-from ..conftest import generate_single_film, generate_es_data
-import aiohttp
-from ..settings import test_settings
-import logging
 
-logger = logging.getLogger()
+import aiohttp
+import pytest
+
+from ..conftest import generate_single_film
+from ..settings import test_settings
+from .indexes import index_to_schema
 
 data_create_index = {
     "index": 'movies',
@@ -47,7 +46,6 @@ async def test_get_film(es_client, es_write_data, query_data, expected_answer):
         **data_create_index
     )
     es_data = generate_single_film()
-    logger.info(es_data)
 
     await es_write_data(es_data, 'movies')
     session = aiohttp.ClientSession()
@@ -68,4 +66,13 @@ async def test_get_film(es_client, es_write_data, query_data, expected_answer):
     assert body == expected_answer
 
 
+@pytest.mark.asyncio
+async def test_nonexistent_film(es_client):
 
+    url = test_settings.SERVICE_URL + f'films/nonexistentfilm'
+
+    session = aiohttp.ClientSession()
+    async with session.get(url) as response:
+        code = response.status
+
+    assert code == http.HTTPStatus.NOT_FOUND

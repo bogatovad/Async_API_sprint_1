@@ -1,10 +1,12 @@
-import pytest
-from elasticsearch import AsyncElasticsearch
-from .settings import test_settings
+import datetime
 import json
 import uuid
-import datetime
+
+import pytest
 import requests
+from elasticsearch import AsyncElasticsearch
+
+from .settings import test_settings
 
 
 @pytest.fixture
