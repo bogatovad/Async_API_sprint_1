@@ -6,11 +6,10 @@ WORKDIR /fastapi
 RUN mkdir /fastapi/tests
 RUN groupadd -r fastapi && useradd -d /fastapi -r -g fastapi fastapi
 
-COPY src/requirements.txt requirements.txt
+COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
-COPY src .
-COPY tests .
+COPY . .
 RUN chown fastapi:fastapi -R /fastapi
 RUN chmod +x ./wait-for-it.sh
 

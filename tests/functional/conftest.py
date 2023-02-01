@@ -5,6 +5,7 @@ import json
 import uuid
 import datetime
 import requests
+import aioredis
 
 
 @pytest.fixture
@@ -14,6 +15,13 @@ async def es_client():
     await client.close()
     requests.delete('http://elasticsearch:9200/movies')
     requests.delete('http://elasticsearch:9200/persons')
+
+
+@pytest.fixture
+async def redis_client():
+    redis = await aioredis.create_redis_pool(('redis', '6379'), minsize=10, maxsize=20)
+    yield redis
+    # await redis.close()
 
 
 def get_es_bulk_query(es_data, es_index, es_id_field):

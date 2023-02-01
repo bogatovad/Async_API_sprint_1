@@ -168,7 +168,7 @@ async def test_search_persons(es_client, es_write_data, query_data, expected_ans
     ]
 )
 @pytest.mark.asyncio
-async def test_search_persons_cache(es_client, es_write_data, query_data, expected_answer):
+async def test_search_persons_cache(es_client, redis_client, es_write_data, query_data, expected_answer):
     for index in ("movies", "genres", "persons"):
         data_create_index = {
             "index": index,
@@ -182,7 +182,14 @@ async def test_search_persons_cache(es_client, es_write_data, query_data, expect
     await es_write_data(es_data, 'persons')
     session = aiohttp.ClientSession()
 
-    # Проверим кэш перед запросом.
+    # Очистим кэш перед запросом.
+    keys = await redis_client.keys(pattern='*')
+    for key in keys:
+        await redis_client.delete(key)
+    keys = await redis_client.keys(pattern='*')
+
+    # Проверим что кэш пустой.
+    assert len(keys) == 0
 
     # Делаем первый раз запрос.
     url = test_settings.service_url + 'persons/search?query=Petr Ivanov&page[size]=5&page[index]=1'
@@ -191,8 +198,10 @@ async def test_search_persons_cache(es_client, es_write_data, query_data, expect
         status = response.status
         body = await response.json()
 
-    # Проверяем кэш.
+    keys = await redis_client.keys(pattern='*')
 
+    # Проверяем кэш.
+    assert len(keys) == 16
     assert expected_answer == {'status': status, 'length': len(body)}
 
 
