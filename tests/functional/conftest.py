@@ -74,3 +74,27 @@ def generate_es_data():
         }
         for _ in range(60)
     ]
+
+
+def generate_single_film():
+    return [
+        {
+            'id': str('12bb1b7e-b039-4f66-9248-b35d795e38f6'),
+            'imdb_rating': 8.5,
+            'genre': ['Action', 'Sci-Fi'],
+            'title': 'The Star',
+            'description': 'New World',
+            'director': ['Stan'],
+            'actors_names': ['Ann', 'Bob'],
+            'writers_names': ['Ben', 'Howard'],
+            'actors': [
+                {'id': '111', 'name': 'Ann'},
+                {'id': '222', 'name': 'Bob'},
+
+            ],
+            'writers': [
+                {'id': '333', 'name': 'Ben'},
+                {'id': '444', 'name': 'Howard'}
+            ],
+        }
+    ]
