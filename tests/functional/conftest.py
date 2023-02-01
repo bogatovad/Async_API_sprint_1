@@ -5,24 +5,32 @@ import uuid
 import aioredis
 import pytest
 import requests
+from core.config import settings
 from elasticsearch import AsyncElasticsearch
 
 from .settings import test_settings
-from .src.indexes import index_to_schema
+from .utils.indexes import index_to_schema
+
+
+def delete_data_from_elastic(url_elastic: str, urls: list[str]) -> None:
+    for url in urls:
+        requests.delete(f'{url_elastic}/{url}')
 
 
 @pytest.fixture
 async def es_client():
-    client = AsyncElasticsearch(hosts='http://elasticsearch:9200')
+    url_elastic: str = f'http://{settings.ELASTIC_HOST}:{settings.ELASTIC_PORT}'
+    client = AsyncElasticsearch(hosts=url_elastic)
     yield client
     await client.close()
-    requests.delete('http://elasticsearch:9200/movies')
-    requests.delete('http://elasticsearch:9200/persons')
+    delete_data_from_elastic(url_elastic, ['movies', 'persons'])
 
 
 @pytest.fixture
 async def redis_client():
-    redis = await aioredis.create_redis_pool(('redis', '6379'), minsize=10, maxsize=20)
+    redis_host: str = settings.REDIS_HOST
+    redis_port: str = settings.REDIS_PORT
+    redis = await aioredis.create_redis_pool((redis_host, redis_port), minsize=10, maxsize=20)
     yield redis
 
 
