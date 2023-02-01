@@ -1,12 +1,13 @@
-import pytest
-from elasticsearch import AsyncElasticsearch
-from .settings import test_settings
+import datetime
 import json
 import uuid
-import datetime
-import requests
-import aioredis
 
+import aioredis
+import pytest
+import requests
+from elasticsearch import AsyncElasticsearch
+
+from .settings import test_settings
 from .src.indexes import index_to_schema
 
 
@@ -23,7 +24,6 @@ async def es_client():
 async def redis_client():
     redis = await aioredis.create_redis_pool(('redis', '6379'), minsize=10, maxsize=20)
     yield redis
-    # await redis.close()
 
 
 def get_es_bulk_query(es_data, es_index, es_id_field):
@@ -49,6 +49,7 @@ def es_write_data(es_client):
 
 @pytest.fixture
 def generate_es_data_person():
+    """Фикстура для генерации данных по персонажам."""
     persons = [
         {
             'id': str(uuid.uuid4()),
@@ -64,6 +65,7 @@ def generate_es_data_person():
 
 @pytest.fixture
 def generate_es_data():
+    """Фикстура для генерации данных по фильмам."""
     return [
         {
             'id': str(uuid.uuid4()),
