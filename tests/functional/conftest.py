@@ -7,6 +7,8 @@ import datetime
 import requests
 import aioredis
 
+from .src.indexes import index_to_schema
+
 
 @pytest.fixture
 async def es_client():
@@ -45,16 +47,22 @@ def es_write_data(es_client):
     return inner
 
 
+@pytest.fixture
 def generate_es_data_person():
-    return [
+    persons = [
         {
             'id': str(uuid.uuid4()),
             'full_name': 'Petr Ivanov',
         }
         for _ in range(60)
     ]
+    persons.extend([
+        {'id': '42b40c6b-4d07-442f-b652-4ec1ee8b57gg', 'full_name': 'Ivan Petrov'}
+    ])
+    return persons
 
 
+@pytest.fixture
 def generate_es_data():
     return [
         {
@@ -80,3 +88,16 @@ def generate_es_data():
         }
         for _ in range(60)
     ]
+
+
+async def create_index(es_client):
+    """Метод создает индексы для тестирования."""
+    for index in ("movies", "genres", "persons"):
+        data_create_index = {
+            "index": index,
+            "ignore": 400,
+            "body": index_to_schema.get(index)
+        }
+        await es_client.indices.create(
+            **data_create_index
+        )

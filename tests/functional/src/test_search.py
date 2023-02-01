@@ -1,23 +1,23 @@
 import aiohttp
 import pytest
 
-from .indexes import index_to_schema
-from ..conftest import generate_es_data, generate_es_data_person
+from ..conftest import create_index
 from ..settings import test_settings
+from pytest_lazyfixture import lazy_fixture
 
 
 @pytest.mark.parametrize(
-    'query_data, expected_answer',
+    'expected_answer, es_data',
     [
         (
-            {'search': 'The Star'},
-            {'status': 200, 'length': 60}
+                {'status': 200, 'length': 60},
+                lazy_fixture('generate_es_data')
         ),
     ]
 )
 @pytest.mark.asyncio
-async def test_search_movies(es_client, es_write_data, query_data, expected_answer):
-    es_data = generate_es_data()
+async def test_load_movies_elastic(es_write_data,  expected_answer, es_data):
+    """Проверка загрузки данных movies в elasticsearch."""
     await es_write_data(es_data, 'movies')
     session = aiohttp.ClientSession()
     url = test_settings.es_host + 'movies/_search'
@@ -31,89 +31,69 @@ async def test_search_movies(es_client, es_write_data, query_data, expected_answ
 
 
 @pytest.mark.parametrize(
-    'query_data, expected_answer',
+    'expected_answer, es_data',
     [
         (
-            {'search': 'The Star'},
-            {'status': 200, 'length': 5}
+            {'status': 200, 'length': 5},
+            lazy_fixture('generate_es_data')
         ),
     ]
 )
 @pytest.mark.asyncio
-async def test_search_movies_paginator(es_client, es_write_data, query_data, expected_answer):
-    es_data = generate_es_data()
+async def test_search_movies_paginator(es_write_data, expected_answer, es_data):
+    """Проверка пагинации при выдаче фильмов."""
     await es_write_data(es_data, 'movies')
     session = aiohttp.ClientSession()
     url = test_settings.service_url + 'films?page[number]=1&page[size]=5'
+
     async with session.get(url) as response:
         status = response.status
         body = await response.json()
+
     await session.close()
     assert expected_answer == {'status': status, 'length': len(body)}
 
 
 @pytest.mark.parametrize(
-    'query_data, expected_answer',
+    'expected_answer, es_data',
     [
         (
-            {'search': 'The Star'},
-            {'status': 200, 'length': 10}
+            {'status': 200, 'length': 10},
+            lazy_fixture('generate_es_data')
         ),
         (
-            {'search': 'New World'},
-            {'status': 200, 'length': 10}
+            {'status': 200, 'length': 10},
+            lazy_fixture('generate_es_data')
         ),
     ]
 )
 @pytest.mark.asyncio
-async def test_search_movies_filtering(es_client, es_write_data, query_data, expected_answer):
-    es_data = generate_es_data()
+async def test_search_movies_filtering(es_write_data, expected_answer, es_data):
+    """Проверка фильтрации в выдаче фильмов."""
     await es_write_data(es_data, 'movies')
     session = aiohttp.ClientSession()
     url = test_settings.service_url + 'films?filter[genre]=Sci-Fi'
+
     async with session.get(url) as response:
         status = response.status
         body = await response.json()
+
     await session.close()
     assert expected_answer == {'status': status, 'length': len(body)}
 
 
 @pytest.mark.parametrize(
-    'query_data, expected_answer',
+    'expected_answer, es_data',
     [
         (
-            {'search': 'The Star'},
-            {'status': 200, 'length': 60}
+            {'status': 200, 'length': 61},
+            lazy_fixture('generate_es_data_person')
         ),
     ]
 )
 @pytest.mark.asyncio
-async def test_search_movies_elastic(es_client, es_write_data, query_data, expected_answer):
-    es_data = generate_es_data()
-    await es_write_data(es_data, 'movies')
-    session = aiohttp.ClientSession()
-    url = test_settings.es_host + 'movies/_search'
-
-    async with session.get(url) as response:
-        status = response.status
-        body = await response.json()
-
-    await session.close()
-    assert expected_answer == {'status': status, 'length': body['hits']['total']['value']}
-
-
-@pytest.mark.parametrize(
-    'query_data, expected_answer',
-    [
-        (
-            {'search': 'Petr Ivanov'},
-            {'status': 200, 'length': 60}
-        ),
-    ]
-)
-@pytest.mark.asyncio
-async def test_search_persons_elastic(es_client, es_write_data, query_data, expected_answer):
-    es_data = generate_es_data_person()
+async def test_load_persons_elastic(es_write_data, expected_answer, es_data):
+    """Проверка загрузки данных persons в elasticsearch."""
     await es_write_data(es_data, 'persons')
     session = aiohttp.ClientSession()
     url = test_settings.es_host + 'persons/_search'
@@ -127,26 +107,18 @@ async def test_search_persons_elastic(es_client, es_write_data, query_data, expe
 
 
 @pytest.mark.parametrize(
-    'query_data, expected_answer',
+    'expected_answer, es_data',
     [
         (
-            {'search': 'The Star'},
-            {'status': 200, 'length': 5}
+            {'status': 200, 'length': 5},
+            lazy_fixture('generate_es_data_person')
         ),
     ]
 )
 @pytest.mark.asyncio
-async def test_search_persons(es_client, es_write_data, query_data, expected_answer):
-    for index in ("movies", "genres", "persons"):
-        data_create_index = {
-            "index": index,
-            "ignore": 400,
-            "body": index_to_schema.get(index)
-        }
-        await es_client.indices.create(
-            **data_create_index
-        )
-    es_data = generate_es_data_person()
+async def test_search_persons(es_client, es_write_data, expected_answer, es_data):
+    """Проверка поиска по персонажам."""
+    await create_index(es_client)
     await es_write_data(es_data, 'persons')
     session = aiohttp.ClientSession()
     url = test_settings.service_url + 'persons/search?query=Petr Ivanov&page[size]=5&page[index]=1'
@@ -159,26 +131,43 @@ async def test_search_persons(es_client, es_write_data, query_data, expected_ans
 
 
 @pytest.mark.parametrize(
-    'query_data, expected_answer',
+    'expected_answer, es_data',
     [
         (
-            {'search': 'The Star'},
-            {'status': 200, 'length': 5}
+            {"detail": "person not found"},
+            lazy_fixture('generate_es_data_person')
         ),
     ]
 )
 @pytest.mark.asyncio
-async def test_search_persons_cache(es_client, redis_client, es_write_data, query_data, expected_answer):
-    for index in ("movies", "genres", "persons"):
-        data_create_index = {
-            "index": index,
-            "ignore": 400,
-            "body": index_to_schema.get(index)
-        }
-        await es_client.indices.create(
-            **data_create_index
-        )
-    es_data = generate_es_data_person()
+async def test_search_persons_not_found(es_client, es_write_data, expected_answer, es_data):
+    """Проверка поиска по персонажам. Персонаж не найден."""
+    await create_index(es_client)
+    await es_write_data(es_data, 'persons')
+    session = aiohttp.ClientSession()
+    url = test_settings.service_url + 'persons/search?query=Petr123'
+
+    async with session.get(url) as response:
+
+        # not found.
+        body = await response.json()
+
+    assert expected_answer == body
+
+
+@pytest.mark.parametrize(
+    'expected_answer, es_data',
+    [
+        (
+            {'status': 200, 'length': 5},
+            lazy_fixture('generate_es_data_person')
+        ),
+    ]
+)
+@pytest.mark.asyncio
+async def test_search_persons_cache(es_client, redis_client, es_write_data, expected_answer, es_data):
+    """Проверка работы кэша."""
+    await create_index(es_client)
     await es_write_data(es_data, 'persons')
     session = aiohttp.ClientSession()
 
