@@ -10,7 +10,6 @@ COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
 COPY . .
-#COPY ../tests /fastapi/tests
 RUN chown fastapi:fastapi -R /fastapi
 RUN chmod +x ./wait-for-it.sh
 

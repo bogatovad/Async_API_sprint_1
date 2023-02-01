@@ -1,14 +1,37 @@
-import pytest
-from elasticsearch import AsyncElasticsearch
-from .settings import test_settings
+import datetime
 import json
+import uuid
+
+import aioredis
+import pytest
+import requests
+from core.config import settings
+from elasticsearch import AsyncElasticsearch
+
+from .settings import test_settings
+from .utils.indexes import index_to_schema
 
 
-@pytest.fixture(scope='session')
+def delete_data_from_elastic(url_elastic: str, urls: list[str]) -> None:
+    for url in urls:
+        requests.delete(f'{url_elastic}/{url}')
+
+
+@pytest.fixture
 async def es_client():
-    client = AsyncElasticsearch(hosts='http://elasticsearch:9200')
+    url_elastic: str = f'http://{settings.ELASTIC_HOST}:{settings.ELASTIC_PORT}'
+    client = AsyncElasticsearch(hosts=url_elastic)
     yield client
     await client.close()
+    delete_data_from_elastic(url_elastic, ['movies', 'persons'])
+
+
+@pytest.fixture
+async def redis_client():
+    redis_host: str = settings.REDIS_HOST
+    redis_port: str = settings.REDIS_PORT
+    redis = await aioredis.create_redis_pool((redis_host, redis_port), minsize=10, maxsize=20)
+    yield redis
 
 
 def get_es_bulk_query(es_data, es_index, es_id_field):
@@ -23,11 +46,68 @@ def get_es_bulk_query(es_data, es_index, es_id_field):
 
 @pytest.fixture
 def es_write_data(es_client):
-    async def inner(data: list[dict]):
-        bulk_query = get_es_bulk_query(data, test_settings.es_index, test_settings.es_id_field)
+    async def inner(data: list[dict], es_index: str):
+        bulk_query = get_es_bulk_query(data, es_index, test_settings.es_id_field)
         response = await es_client.bulk(bulk_query, refresh=True)
-        print(f'RESPONSE = {response=}')
         await es_client.close()
         if response['errors']:
-            raise Exception('Ошибка записи данных в Elasticsearch')
+            raise Exception(f'Ошибка записи данных в Elasticsearch')
     return inner
+
+
+@pytest.fixture
+def generate_es_data_person():
+    """Фикстура для генерации данных по персонажам."""
+    persons = [
+        {
+            'id': str(uuid.uuid4()),
+            'full_name': 'Petr Ivanov',
+        }
+        for _ in range(60)
+    ]
+    persons.extend([
+        {'id': '42b40c6b-4d07-442f-b652-4ec1ee8b57gg', 'full_name': 'Ivan Petrov'}
+    ])
+    return persons
+
+
+@pytest.fixture
+def generate_es_data():
+    """Фикстура для генерации данных по фильмам."""
+    return [
+        {
+            'id': str(uuid.uuid4()),
+            'imdb_rating': 8.5,
+            'genre': ['Action', 'Sci-Fi'],
+            'title': 'The Star',
+            'description': 'New World',
+            'director': ['Stan'],
+            'actors_names': ['Ann', 'Bob'],
+            'writers_names': ['Ben', 'Howard'],
+            'actors': [
+                {'id': '111', 'name': 'Ann'},
+                {'id': '222', 'name': 'Bob'},
+            ],
+            'writers': [
+                {'id': '333', 'name': 'Ben'},
+                {'id': '444', 'name': 'Howard'}
+            ],
+            'created_at': datetime.datetime.now().isoformat(),
+            'updated_at': datetime.datetime.now().isoformat(),
+            'film_work_type': 'movie'
+        }
+        for _ in range(60)
+    ]
+
+
+async def create_index(es_client):
+    """Метод создает индексы для тестирования."""
+    for index in ("movies", "genres", "persons"):
+        data_create_index = {
+            "index": index,
+            "ignore": 400,
+            "body": index_to_schema.get(index)
+        }
+        await es_client.indices.create(
+            **data_create_index
+        )
