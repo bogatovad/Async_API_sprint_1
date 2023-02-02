@@ -1,7 +1,8 @@
-import aiohttp
 import datetime
 import json
 import uuid
+
+import aiohttp
 import aioredis
 import pytest
 import requests
@@ -10,15 +11,12 @@ from elasticsearch import AsyncElasticsearch
 
 from .settings import test_settings
 from .utils.indexes import index_to_schema
+from .utils.models import HTTPResponse
 
 
 def delete_data_from_elastic(url_elastic: str, urls: list[str]) -> None:
     for url in urls:
         requests.delete(f'{url_elastic}/{url}')
-
-from .settings import test_settings
-from .src.indexes import index_to_schema
-from .utils.models import HTTPResponse
 
 
 @pytest.fixture(scope='function')

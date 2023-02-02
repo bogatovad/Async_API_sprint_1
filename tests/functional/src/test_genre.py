@@ -1,13 +1,9 @@
-import aiohttp
+from http import HTTPStatus
+
 import pytest
 from pytest_lazyfixture import lazy_fixture
 
-from .indexes import index_to_schema
-from ..conftest import (generate_es_data, generate_es_data_person,
-                         generate_es_data_genre, make_get_request,
-                         create_index)
-from ..utils.models import Genre
-from ..settings import test_settings
+from ..conftest import create_index
 
 
 @pytest.mark.parametrize(
@@ -15,12 +11,12 @@ from ..settings import test_settings
     [
         (
             {'uuid': '1111-2222-3333-4444'},
-            404
+            HTTPStatus.NOT_FOUND
         ),
     ]
 )
 @pytest.mark.asyncio
-async def test_nonexisting_genre(make_get_request, query_data, expected_answer):
+async def test_non_existing_genre(make_get_request, query_data, expected_answer):
     response = await make_get_request(f'genres/{query_data}')
     assert expected_answer == response.status
 
@@ -42,4 +38,4 @@ async def test_get_genre_by_id(es_client, es_write_data, make_get_request, uuid_
     await es_write_data(es_data, 'genres')
     response = await make_get_request(f'genres/{uuid_genre}')
     assert response.body == expected_answer
-    assert response.status == 200, f'{response.status}должен быть 200'
+    assert response.status == HTTPStatus.OK, f'{response.status} должен быть 200'
