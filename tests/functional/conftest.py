@@ -25,7 +25,7 @@ async def es_client():
     client = AsyncElasticsearch(hosts=url_elastic)
     yield client
     await client.close()
-    delete_data_from_elastic(url_elastic, ['movies', 'persons'])
+    delete_data_from_elastic(url_elastic, ['movies', 'persons', 'genre'])
 
 
 @pytest.fixture
@@ -130,7 +130,7 @@ def generate_es_data_genre():
                 'name': 'Thriller',
                 'description': 'Thrilling and scary'
             }
-            for _ in range(60)
+            for _ in range(9)
         ]
     genres.append(
         {
