@@ -7,11 +7,12 @@ import datetime
 import requests
 
 from .settings import test_settings
+from .src.indexes import index_to_schema
 from .utils.models import HTTPResponse
 
 
-@pytest.fixture
-async def es_client(scope='session'):
+@pytest.fixture(scope='function')
+async def es_client():
     client = AsyncElasticsearch(hosts='http://elasticsearch:9200')
     yield client
     await client.close()
@@ -19,8 +20,8 @@ async def es_client(scope='session'):
     requests.delete('http://elasticsearch:9200/persons')
 
 
-@pytest.fixture
-async def session(scope='session'):
+@pytest.fixture(scope='function')
+async def session():
     session = aiohttp.ClientSession()
     yield session
     await session.close()
@@ -47,29 +48,38 @@ def es_write_data(es_client):
 
 
 @pytest.fixture
-def make_get_request():
+def make_get_request(session):
     async def inner(endpoint: str, params: dict = {}) -> HTTPResponse:
-        url = f"{test_settings.SERVICE_URL}/api/v1/{endpoint}"
-        response = requests.get(url, params=params)
-        return HTTPResponse(
-            body=response.json(),
-            status=response.status_code,
-        )
+        url = f"{test_settings.SERVICE_URL}{endpoint}"
+        print(url)
+        async with session.get(url, params=params) as response:
+            return HTTPResponse(
+                body=await response.json(),
+                status=response.status,
+            )
 
     return inner
 
 
+@pytest.fixture
 def generate_es_data_person():
-    return [
+    """Фикстура для генерации данных по персонажам."""
+    persons = [
         {
             'id': str(uuid.uuid4()),
             'full_name': 'Petr Ivanov',
         }
         for _ in range(60)
     ]
+    persons.extend([
+        {'id': '42b40c6b-4d07-442f-b652-4ec1ee8b57gg', 'full_name': 'Ivan Petrov'}
+    ])
+    return persons
 
 
+@pytest.fixture
 def generate_es_data():
+    """Фикстура для генерации данных по фильмам."""
     return [
         {
             'id': str(uuid.uuid4()),
@@ -83,8 +93,6 @@ def generate_es_data():
             'actors': [
                 {'id': '111', 'name': 'Ann'},
                 {'id': '222', 'name': 'Bob'},
-                # {'id': '44', 'name': 'Petr Ivanov'}
-
             ],
             'writers': [
                 {'id': '333', 'name': 'Ben'},
@@ -97,11 +105,35 @@ def generate_es_data():
         for _ in range(60)
     ]
 
+@pytest.fixture
 def generate_es_data_genre():
-    return [
+    """Фикстура для генерации данных по жанрам."""
+    genres = [
+            {
+                'id': str(uuid.uuid4()),
+                'name': 'Thriller',
+                'description': 'Thrilling and scary'
+            }
+            for _ in range(60)
+        ]
+    genres.append(
         {
-            'id': str(uuid.uuid4()),
-            'name': 'Science-fiction',
+            'id': '9c91a5b2-eb70-4889-8581-ebe427370edd',
+            'name': 'Musical',
+            'description': 'Nice and dancy'
         }
-        for _ in range(60)
-    ]
+    )
+    return genres
+
+async def create_index(es_client):
+    """Метод создает индексы для тестирования."""
+    for index in ("movies", "genres", "persons"):
+        data_create_index = {
+            "index": index,
+            "ignore": 400,
+            "body": index_to_schema.get(index)
+        }
+        await es_client.indices.create(
+            **data_create_index
+        )
+
