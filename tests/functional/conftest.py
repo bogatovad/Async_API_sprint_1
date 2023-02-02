@@ -25,7 +25,7 @@ async def es_client():
     client = AsyncElasticsearch(hosts=url_elastic)
     yield client
     await client.close()
-    delete_data_from_elastic(url_elastic, ['movies', 'persons'])
+    delete_data_from_elastic(url_elastic, ['movies', 'persons', 'genre'])
 
 
 @pytest.fixture
@@ -61,6 +61,13 @@ def es_write_data(es_client):
         if response['errors']:
             raise Exception(f'Ошибка записи данных в Elasticsearch')
     return inner
+
+
+@pytest.fixture(scope='function')
+async def redis_flushall():
+    client = await aioredis.create_redis_pool((test_settings.REDIS_HOST))
+    await client.flushall(async_op=True)
+    client.close()
 
 
 @pytest.fixture
