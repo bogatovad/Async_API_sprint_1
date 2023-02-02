@@ -114,7 +114,7 @@ def generate_es_data_genre():
                 'name': 'Thriller',
                 'description': 'Thrilling and scary'
             }
-            for _ in range(60)
+            for _ in range(9)
         ]
     genres.append(
         {

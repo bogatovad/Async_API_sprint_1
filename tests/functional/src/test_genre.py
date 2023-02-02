@@ -42,4 +42,23 @@ async def test_get_genre_by_id(es_client, es_write_data, make_get_request, uuid_
     await es_write_data(es_data, 'genres')
     response = await make_get_request(f'genres/{uuid_genre}')
     assert response.body == expected_answer
-    assert response.status == 200, f'{response.status}должен быть 200'
+    assert response.status == 200, f'{response.status} должен быть 200'
+
+
+@pytest.mark.parametrize(
+    'expected_answer, es_data',
+    [
+        (
+            10,
+            lazy_fixture('generate_es_data_genre')
+        ),
+    ]
+)
+@pytest.mark.asyncio
+async def test_get_all_genres(es_client, es_write_data, make_get_request, expected_answer, es_data):
+    """Проверка вывода всех жанров."""
+    await create_index(es_client)
+    await es_write_data(es_data, 'genres')
+    response = await make_get_request('genres')
+    assert len(response.body) == expected_answer
+    assert response.status == 200, f'{response.status} должен быть 200'
