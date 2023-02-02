@@ -118,7 +118,7 @@ async def test_search_persons(es_client, es_write_data, expected_answer, es_data
     await create_index(es_client)
     await es_write_data(es_data, 'persons')
     session = aiohttp.ClientSession()
-    url = test_settings.service_url + 'persons/search?query=Petr Ivanov&page[size]=5&page[index]=1'
+    url = test_settings.SERVICE_URL + 'persons/search?query=Petr Ivanov&page[size]=5&page[index]=1'
 
     async with session.get(url) as response:
         status = response.status
@@ -142,7 +142,7 @@ async def test_search_persons_not_found(es_client, es_write_data, expected_answe
     await create_index(es_client)
     await es_write_data(es_data, 'persons')
     session = aiohttp.ClientSession()
-    url = test_settings.service_url + 'persons/search?query=Petr123'
+    url = test_settings.SERVICE_URL + 'persons/search?query=Petr123'
 
     async with session.get(url) as response:
 
@@ -178,7 +178,7 @@ async def test_search_persons_cache(es_client, redis_client, es_write_data, expe
     assert len(keys) == 0
 
     # Делаем первый раз запрос.
-    url = test_settings.service_url + 'persons/search?query=Petr Ivanov&page[size]=5&page[index]=1'
+    url = test_settings.SERVICE_URL + 'persons/search?query=Petr Ivanov&page[size]=5&page[index]=1'
 
     async with session.get(url) as response:
         status = response.status
