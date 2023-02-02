@@ -4,6 +4,9 @@ include envs/.env
 BASE_COMMAND = docker-compose run --rm
 COMMAND = ${BASE_COMMAND}  /bin/bash -c
 COMPOSE = docker-compose
+DOCKER_COMPOSE_CMD=docker-compose
+DOCKER_COMPOSE_DIR=`pwd`
+COMPOSE_TEST_FILE = tests/functional
 
 build:
 	${COMPOSE} build
@@ -28,6 +31,14 @@ isort:
 
 fastapi-bash:
 	${BASE_COMMAND} fastapi /bin/bash
+
+test_build:
+	${DOCKER_COMPOSE_CMD} build -f ${COMPOSE_TEST_FILE}
+
+test_up:
+	${DOCKER_COMPOSE_CMD} up -f ${COMPOSE_TEST_FILE} --exit-code-from tests
+
+run_tests: test_build
 
 tests-build:
 	docker-compose -f tests/functional/docker-compose.yml build

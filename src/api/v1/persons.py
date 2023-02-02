@@ -30,7 +30,7 @@ async def search_persons(
     )
     persons = await person_service.search_persons(query_params)
     if not persons:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=ErrorMessage.PERSON_FILMWORK_NOT_FOUND)
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=ErrorMessage.PERSON_NOT_FOUND)
     return [
         PersonDescriptionResponse(
             uuid=person.id,

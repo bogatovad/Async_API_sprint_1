@@ -5,7 +5,7 @@ import pytest
 
 from ..conftest import generate_single_film
 from ..settings import test_settings
-from .indexes import index_to_schema
+from ..utils.indexes import index_to_schema
 
 data_create_index = {
     "index": 'movies',
