@@ -31,6 +31,7 @@ class RedisCache(CacheBackend):
     def create_value(self, data):
         return pickle.dumps(data)
 
+    # todo: RedisCache управляет кэшом И подготавливает данные И создает ключ. => нарушение SRP.
     @staticmethod
     def preparation_data_for_key(index, data: dict):
         """Подготовка данных для генерации ключа."""
