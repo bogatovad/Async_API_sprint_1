@@ -11,7 +11,8 @@ from ..settings import test_settings
     [
         (
             '42b40c6b-4d07-442f-b652-4ec1ee8b57gg',
-            {'uuid': '42b40c6b-4d07-442f-b652-4ec1ee8b57gg', 'name': 'Ivan Petrov', 'role': [], 'film_ids': []},
+            {'uuid': '42b40c6b-4d07-442f-b652-4ec1ee8b57gg',
+                'name': 'Ivan Petrov', 'role': [], 'film_ids': []},
             lazy_fixture('generate_es_data_person')
         ),
     ]
@@ -28,4 +29,3 @@ async def test_get_person(es_client, es_write_data, uuid_person, expected_answer
         body = await response.json()
 
     assert body == expected_answer
-
