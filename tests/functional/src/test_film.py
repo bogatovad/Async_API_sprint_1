@@ -6,6 +6,7 @@ import pytest
 from ..conftest import generate_single_film
 from ..settings import test_settings
 from ..utils.indexes import index_to_schema
+from ..conftest import create_index
 
 data_create_index = {
     "index": 'movies',
@@ -42,9 +43,7 @@ data_create_index = {
 @pytest.mark.asyncio
 async def test_get_film(es_client, es_write_data, uuid_film, expected_answer):
 
-    await es_client.indices.create(
-        **data_create_index
-    )
+    await create_index(es_client)
     es_data = generate_single_film()
 
     await es_write_data(es_data, 'movies')
@@ -69,3 +68,24 @@ async def test_nonexistent_film(es_client):
         code = response.status
 
     assert code == http.HTTPStatus.NOT_FOUND
+
+
+@pytest.mark.asyncio
+async def test_all_films(es_client, es_write_data, generate_es_data):
+    await create_index(es_client)
+    await es_write_data(generate_es_data, 'movies')
+
+    url = test_settings.SERVICE_URL + 'films/?page[size]=60&page[number]=1'
+
+    session = aiohttp.ClientSession()
+    async with session.get(url) as response:
+        code = response.status
+        body = await response.json()
+
+    assert code == http.HTTPStatus.OK
+    assert len(body) == 60
+    for response_item, expected_item in zip(body, generate_es_data):
+        assert (
+            response_item['uuid'], response_item['title'], response_item['imdb_rating'] ==
+            expected_item['id'], expected_item['title'], expected_item['imdb_rating']
+        )

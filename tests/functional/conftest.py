@@ -114,9 +114,6 @@ def generate_es_data():
                 {'id': '333', 'name': 'Ben'},
                 {'id': '444', 'name': 'Howard'}
             ],
-            'created_at': datetime.datetime.now().isoformat(),
-            'updated_at': datetime.datetime.now().isoformat(),
-            'film_work_type': 'movie'
         }
         for _ in range(60)
     ]
