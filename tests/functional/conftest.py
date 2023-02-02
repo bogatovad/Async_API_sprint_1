@@ -1,10 +1,20 @@
 import aiohttp
-import pytest
-from elasticsearch import AsyncElasticsearch
+import datetime
 import json
 import uuid
-import datetime
+import aioredis
+import pytest
 import requests
+from core.config import settings
+from elasticsearch import AsyncElasticsearch
+
+from .settings import test_settings
+from .utils.indexes import index_to_schema
+
+
+def delete_data_from_elastic(url_elastic: str, urls: list[str]) -> None:
+    for url in urls:
+        requests.delete(f'{url_elastic}/{url}')
 
 from .settings import test_settings
 from .src.indexes import index_to_schema
@@ -13,11 +23,19 @@ from .utils.models import HTTPResponse
 
 @pytest.fixture(scope='function')
 async def es_client():
-    client = AsyncElasticsearch(hosts='http://elasticsearch:9200')
+    url_elastic: str = f'http://{settings.ELASTIC_HOST}:{settings.ELASTIC_PORT}'
+    client = AsyncElasticsearch(hosts=url_elastic)
     yield client
     await client.close()
-    requests.delete('http://elasticsearch:9200/movies')
-    requests.delete('http://elasticsearch:9200/persons')
+    delete_data_from_elastic(url_elastic, ['movies', 'persons'])
+
+
+@pytest.fixture
+async def redis_client():
+    redis_host: str = settings.REDIS_HOST
+    redis_port: str = settings.REDIS_PORT
+    redis = await aioredis.create_redis_pool((redis_host, redis_port), minsize=10, maxsize=20)
+    yield redis
 
 
 @pytest.fixture(scope='function')
@@ -125,6 +143,7 @@ def generate_es_data_genre():
     )
     return genres
 
+
 async def create_index(es_client):
     """Метод создает индексы для тестирования."""
     for index in ("movies", "genres", "persons"):
@@ -136,4 +155,3 @@ async def create_index(es_client):
         await es_client.indices.create(
             **data_create_index
         )
-

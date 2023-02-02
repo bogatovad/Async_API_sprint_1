@@ -145,6 +145,70 @@ async def test_search_persons_not_found(es_client, es_write_data, expected_answe
     await create_index(es_client)
     await es_write_data(es_data, 'persons')
     session = aiohttp.ClientSession()
+    url = test_settings.service_url + 'persons/search?query=Petr123'
+
+    async with session.get(url) as response:
+
+        # not found.
+        body = await response.json()
+
+    assert expected_answer == body
+
+
+@pytest.mark.parametrize(
+    'expected_answer, es_data',
+    [
+        (
+            {'status': 200, 'length': 5},
+            lazy_fixture('generate_es_data_person')
+        ),
+    ]
+)
+@pytest.mark.asyncio
+async def test_search_persons_cache(es_client, redis_client, es_write_data, expected_answer, es_data):
+    """Проверка работы кэша."""
+    await create_index(es_client)
+    await es_write_data(es_data, 'persons')
+    session = aiohttp.ClientSession()
+
+    # Очистим кэш перед запросом.
+    keys = await redis_client.keys(pattern='*')
+    for key in keys:
+        await redis_client.delete(key)
+    keys = await redis_client.keys(pattern='*')
+
+    # Проверим что кэш пустой.
+    assert len(keys) == 0
+
+    # Делаем первый раз запрос.
+    url = test_settings.service_url + 'persons/search?query=Petr Ivanov&page[size]=5&page[index]=1'
+
+    async with session.get(url) as response:
+        status = response.status
+        body = await response.json()
+
+    keys = await redis_client.keys(pattern='*')
+
+    # Проверяем кэш.
+    assert len(keys) == 16
+    assert expected_answer == {'status': status, 'length': len(body)}
+
+
+@pytest.mark.parametrize(
+    'expected_answer, es_data',
+    [
+        (
+            {"detail": "person not found"},
+            lazy_fixture('generate_es_data_person')
+        ),
+    ]
+)
+@pytest.mark.asyncio
+async def test_search_persons_not_found(es_client, es_write_data, expected_answer, es_data):
+    """Проверка поиска по персонажам. Персонаж не найден."""
+    await create_index(es_client)
+    await es_write_data(es_data, 'persons')
+    session = aiohttp.ClientSession()
     url = test_settings.SERVICE_URL + 'persons/search?query=Petr123'
 
     async with session.get(url) as response:
