@@ -39,7 +39,7 @@ async def test_get_genre_by_id(es_client, es_write_data, make_get_request, uuid_
     await es_write_data(es_data, 'genres')
     response = await make_get_request(f'genres/{uuid_genre}')
     assert response.body == expected_answer
-    assert response.status == 200, f'{response.status} должен быть 200'
+    assert response.status == HTTPStatus.OK, f'{response.status} должен быть 200'
 
 
 @pytest.mark.parametrize(
@@ -58,7 +58,7 @@ async def test_get_all_genres(es_client, es_write_data, make_get_request, expect
     await es_write_data(es_data, 'genres')
     response = await make_get_request('genres')
     assert len(response.body) == expected_answer
-    assert response.status == 200, f'{response.status} должен быть 200'
+    assert response.status == HTTPStatus.OK, f'{response.status} должен быть 200'
 
 
 @pytest.mark.parametrize(
@@ -88,4 +88,5 @@ async def test_genre_cache(
 
     assert len(keys) == 1
     assert expected_answer == len(response.body)
-    assert response.status == 200
+    assert response.status == HTTPStatus.OK, f'{response.status} должен быть 200'
+
