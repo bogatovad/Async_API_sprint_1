@@ -28,3 +28,4 @@ async def test_get_person(es_client, es_write_data, uuid_person, expected_answer
         body = await response.json()
 
     assert body == expected_answer
+
