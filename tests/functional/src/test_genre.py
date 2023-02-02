@@ -89,4 +89,3 @@ async def test_genre_cache(
     assert len(keys) == 1
     assert expected_answer == len(response.body)
     assert response.status == HTTPStatus.OK, f'{response.status} должен быть 200'
-

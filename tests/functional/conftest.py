@@ -63,13 +63,6 @@ def es_write_data(es_client):
     return inner
 
 
-@pytest.fixture(scope='function')
-async def redis_flushall():
-    client = await aioredis.create_redis_pool((test_settings.REDIS_HOST))
-    await client.flushall(async_op=True)
-    client.close()
-
-
 @pytest.fixture
 def make_get_request(session):
     async def inner(endpoint: str, params: dict = {}) -> HTTPResponse:
