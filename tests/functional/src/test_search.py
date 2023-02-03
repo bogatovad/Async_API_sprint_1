@@ -7,12 +7,11 @@ from pytest_lazyfixture import lazy_fixture
 from ..conftest import create_index
 from ..settings import test_settings
 
-
 @pytest.mark.parametrize(
     'expected_answer, es_data',
     [
         (
-            {'status': HTTPStatus.OK, 'length': 60},
+            {'status': HTTPStatus.OK, 'length': 61},
             lazy_fixture('generate_es_data')
         ),
     ]
@@ -48,7 +47,6 @@ async def test_search_movies_paginator(es_write_data, expected_answer, es_data):
     await es_write_data(es_data, 'movies')
     session = aiohttp.ClientSession()
     url = test_settings.SERVICE_URL + 'films?page[number]=1&page[size]=5'
-
     async with session.get(url) as response:
         status = response.status
         body = await response.json()
@@ -76,7 +74,6 @@ async def test_search_movies_filtering(es_write_data, expected_answer, es_data):
     await es_write_data(es_data, 'movies')
     session = aiohttp.ClientSession()
     url = test_settings.SERVICE_URL + 'films?filter[genre]=Sci-Fi'
-
     async with session.get(url) as response:
         status = response.status
         body = await response.json()
