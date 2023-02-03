@@ -66,7 +66,7 @@ async def test_nonexistent_film(es_client):
     'expected_answer', ({'status': http.HTTPStatus.OK, 'length': 61},)
 )
 @pytest.mark.asyncio
-async def test_all_films(es_client, es_write_data, generate_es_data, expected_answer):
+async def test_all_films(es_client, es_write_data, generate_es_data, expected_answer, generate_expected_answer_for_all_films):
     await create_index(es_client)
     await es_write_data(generate_es_data, 'movies')
 
@@ -79,10 +79,10 @@ async def test_all_films(es_client, es_write_data, generate_es_data, expected_an
 
     assert code == expected_answer['status']
     assert len(body) == expected_answer['length']
-    for response_item, expected_item in zip(body, generate_es_data):
+    for response_item, expected_item in zip(body, generate_expected_answer_for_all_films):
         assert (
             response_item['uuid'], response_item['title'], response_item['imdb_rating'] ==
-            expected_item['id'], expected_item['title'], expected_item['imdb_rating']
+            expected_item
         )
 
 

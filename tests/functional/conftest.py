@@ -171,3 +171,9 @@ async def create_index(es_client):
         await es_client.indices.create(
             **data_create_index
         )
+
+
+@pytest.fixture
+def generate_expected_answer_for_all_films(generate_es_data):
+    data = generate_es_data
+    return [(item['id'], item['title'], item['imdb_rating']) for item in data]
