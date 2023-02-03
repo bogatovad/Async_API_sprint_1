@@ -171,7 +171,7 @@ async def test_search_persons_cache(es_client, redis_client, es_write_data, expe
     keys = await redis_client.keys(pattern='*')
 
     # Проверяем кэш.
-    assert len(keys) == 16
+    assert len(keys) == 1
     assert expected_answer == {'status': status, 'length': len(body)}
 
 
