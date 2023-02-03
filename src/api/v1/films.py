@@ -18,6 +18,7 @@ router = APIRouter()
     response_description='Список фильмов на главной странице'
 )
 async def search_films(
+        request: Request,
         page_size: Optional[int] = Query(10, alias='page[size]', description='Items amount on page', ge=1),
         page_number: Optional[int] = Query(1, alias='page[number]', description='Page number for pagination', ge=1),
         query: Optional[str] = Query('', description='Search string for query.'),
@@ -27,7 +28,8 @@ async def search_films(
         page_size=page_size,
         page_number=page_number,
         query=query,
-        sort=sort
+        sort=sort,
+        request=request
     )
     films = await film_service.get_search(query_params)
     if not films:

@@ -3,7 +3,6 @@ def es_search_template(*args, **kwargs) -> dict:
     print("ARGS123!!", args)
 
     index, query_params, _ = args
-
     print(index)
     print(query_params)
 

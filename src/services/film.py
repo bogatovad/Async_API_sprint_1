@@ -10,41 +10,11 @@ from core.config import settings
 from db.elastic import get_elastic
 from db.redis import get_redis
 from models.film import Film
-from services.cache_backend import RedisCache
+from services.cache_backend import RedisCache, cache
 from services.paginator import Paginator
 from services.utils import es_search_template
 
-from typing import Callable, Optional
-
 logger = logging.getLogger(__name__)
-
-ResponseType = Optional[Film | list[Film]]
-
-
-def cache(get_data_from_elastic: Callable[..., ResponseType]) -> Callable[..., ResponseType]:
-    """Декоратор, осуществляющий кэширование запросов."""
-    async def wrapper(self, *args, **kwargs):
-        # Получили ключ.
-        key = get_key(*args)
-        film = await self.get_from_cache(key)
-
-        if film is not None:
-            return film
-
-        film = await get_data_from_elastic(self, args, kwargs)
-
-        # Сохранили данные в кэш.
-        await self.set_to_cache(key, film, settings.FILM_CACHE_EXPIRE_IN_SECONDS)
-        return film
-    return wrapper
-
-
-def get_key(*args, **kwargs) -> str:
-    """Генерация ключа для redis."""
-    print('sdfsdfsdf', args)
-    params,  = args
-    starlette_requests = params.get("request")
-    return str(starlette_requests.url)
 
 
 class FilmService(Paginator, RedisCache):
@@ -95,22 +65,15 @@ class FilmService(Paginator, RedisCache):
 
     @cache
     async def get_all_films(self, *args, **kwargs):
-        print(f'DSSA!! {kwargs=}')
         page, body = es_search_template(self.index, *args)
         loads_films = await self.paginator(self.index, body, page)
         films_schema = [Film(**film['_source']) for film in loads_films]
         return films_schema
 
-    async def get_search(self, query_params):
-        page, body = es_search_template(self.index, query_params)
-        data_for_key = self.preparation_data_for_key(self.index, query_params)
-        key_movies_search = self.create_key(data_for_key)
-        loads_movies = await self.get_from_cache(key_movies_search)
-
-        if not loads_movies:
-            loads_movies = await self.paginator(self.index, body, page)
-            value = self.create_value(loads_movies)
-            await self.set_to_cache(key_movies_search, value, settings.FILM_CACHE_EXPIRE_IN_SECONDS)
+    @cache
+    async def get_search(self, *args, **kwargs):
+        page, body = es_search_template(self.index, *args)
+        loads_movies = await self.paginator(self.index, body, page)
         return [Film(**movie['_source']) for movie in loads_movies]
 
 

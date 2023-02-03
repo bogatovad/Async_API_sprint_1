@@ -1,23 +1,10 @@
-import pickle
 from abc import ABC
+from typing import Callable, Optional
+from models.film import Film
+from core.config import settings
+from services.serializer import PickleSerializeData
 
-
-class SerializeData(ABC):
-    def serialize(self, data):
-        """Сериализация данных."""
-        pass
-
-    def deserialize(self, data):
-        """Распаковка данных."""
-        pass
-
-
-class PickleSerializeData(SerializeData):
-    def serialize(self, data):
-        return pickle.dumps(data)
-
-    def deserialize(self, data):
-        return pickle.loads(data)
+ResponseType = Optional[Film | list[Film]]
 
 
 class CacheBackend(ABC):
@@ -43,3 +30,28 @@ class RedisCache(CacheBackend, PickleSerializeData):
     async def set_to_cache(self, key, value, expire):
         value = self.serialize(value)
         await self.redis.set(key, value, expire=expire)
+
+
+def get_key(*args, **kwargs) -> str:
+    """Генерация ключа для redis."""
+    params,  = args
+    starlette_requests = params.get("request")
+    return str(starlette_requests.url)
+
+
+def cache(get_data_from_elastic: Callable[..., ResponseType]) -> Callable[..., ResponseType]:
+    """Декоратор, осуществляющий кэширование запросов."""
+    async def wrapper(self, *args, **kwargs):
+        # Получили ключ.
+        key = get_key(*args)
+        data = await self.get_from_cache(key)
+
+        if data is not None:
+            return data
+
+        data = await get_data_from_elastic(self, args, kwargs)
+
+        # Сохранили данные в кэш.
+        await self.set_to_cache(key, data, settings.FILM_CACHE_EXPIRE_IN_SECONDS)
+        return data
+    return wrapper
