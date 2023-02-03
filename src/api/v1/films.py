@@ -101,10 +101,22 @@ async def list_films(
     response_description='Список похожих фильмов'
 )
 async def films_alike(
+        request: Request,
         film_id: str = Path(None, description='id фильма, для которого ищем похожие'),
         film_service: FilmService = Depends(get_film_service)
 ) -> list[FilmResponse]:
-    films = await film_service.get_films_alike(film_id)
+    query_params = dict(
+        film_id=film_id,
+        request=request
+    )
+    films = await film_service.get_films_alike(query_params)
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=ErrorMessage.FILM_NOT_FOUND)
-    return [FilmResponse(uuid=film.id, title=film.title, imdb_rating=film.imdb_rating) for film in films]
+    return [
+        FilmResponse(
+            uuid=film.id,
+            title=film.title,
+            imdb_rating=film.imdb_rating
+        )
+        for film in films
+    ]

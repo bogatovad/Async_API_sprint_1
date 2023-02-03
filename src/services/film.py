@@ -1,12 +1,10 @@
 import logging
-import pickle
 from functools import lru_cache
 
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch, NotFoundError
 from fastapi import Depends
 
-from core.config import settings
 from db.elastic import get_elastic
 from db.redis import get_redis
 from models.film import Film
@@ -40,14 +38,16 @@ class FilmService(Paginator, RedisCache):
         doc = doc['_source']
         return Film(**doc)
 
-    async def get_films_alike(self, film_id: str):
-        cache_key = f'films/alike/{film_id}'
-        films = await self.redis.get(cache_key)
-        if films:
-            logger.debug(f'Getting info from cache by key {cache_key}')
-            return pickle.loads(films)
-        film = await self.get_by_id(film_id)
+    @cache
+    async def get_films_alike(self, *args, **kwargs):
+        params, _ = args
+        film = await self.get_by_id(dict(
+            film_id=params[0].get('film_id'),
+            request=params[0].get('request')
+        ))
         genres = film.genre
+
+        # Запрос на поиск фильмов с таким же жанром.
         query_params = {
             "query": {
                 "terms": {
@@ -56,12 +56,7 @@ class FilmService(Paginator, RedisCache):
             }
         }
         films = await self.elastic.search(index="movies", body=query_params)
-        films = [Film(**film['_source']) for film in films['hits']['hits']]
-
-        logger.debug(f'Storing info ini cache by key {cache_key}')
-        await self.redis.set(cache_key, pickle.dumps(films), expire=settings.FILM_CACHE_EXPIRE_IN_SECONDS)
-
-        return films
+        return [Film(**film['_source']) for film in films['hits']['hits']]
 
     @cache
     async def get_all_films(self, *args, **kwargs):
