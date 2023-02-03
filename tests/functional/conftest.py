@@ -96,7 +96,7 @@ def generate_es_data_person():
 @pytest.fixture
 def generate_es_data():
     """Фикстура для генерации данных по фильмам."""
-    return [
+    data = [
         {
             'id': str(uuid.uuid4()),
             'imdb_rating': 8.5,
@@ -116,7 +116,8 @@ def generate_es_data():
             ],
         }
         for _ in range(60)
-    ].append(
+    ]
+    data.append(
         {
             'id': str('12bb1b7e-b039-4f66-9248-b35d795e38f6'),
             'imdb_rating': 8.5,
@@ -137,6 +138,7 @@ def generate_es_data():
             ],
         }
     )
+    return data
 
 @pytest.fixture
 def generate_es_data_genre():
