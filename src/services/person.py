@@ -120,10 +120,10 @@ class PersonService(Paginator, RedisCache):
         film_ids = list(set(movies_actor + movies_writer + movies_director))
         role = [
             role[0] for role in (
-                    ('actor', count_movies_actor),
-                    ('writer', count_movies_writers),
-                    ('director', count_movies_director)
-                ) if role[1] != 0
+                ('actor', count_movies_actor),
+                ('writer', count_movies_writers),
+                ('director', count_movies_director)
+            ) if role[1] != 0
         ]
         return PersonDescription(**person['_source'], role=role, film_ids=film_ids)
 
