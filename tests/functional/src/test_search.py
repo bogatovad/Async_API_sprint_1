@@ -71,7 +71,6 @@ async def test_search_movies_paginator(es_write_data, expected_answer, es_data):
 @pytest.mark.asyncio
 async def test_search_movies_filtering(es_write_data, expected_answer, es_data):
     """Проверка фильтрации в выдаче фильмов."""
-    print(es_data)
     await es_write_data(es_data, 'movies')
     session = aiohttp.ClientSession()
     url = test_settings.SERVICE_URL + 'films?filter[genre]=Sci-Fi'
