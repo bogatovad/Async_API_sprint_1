@@ -7,7 +7,6 @@ from ..settings import test_settings
 from ..conftest import create_index
 
 
-
 @pytest.mark.parametrize(
     'uuid_film, expected_answer, es_data',
     [
@@ -66,7 +65,8 @@ async def test_nonexistent_film(es_client):
     'expected_answer', ({'status': http.HTTPStatus.OK, 'length': 61},)
 )
 @pytest.mark.asyncio
-async def test_all_films(es_client, es_write_data, generate_es_data, expected_answer, generate_expected_answer_for_all_films):
+async def test_all_films(es_client, es_write_data, generate_es_data, expected_answer,
+                         generate_expected_answer_for_all_films):
     await create_index(es_client)
     await es_write_data(generate_es_data, 'movies')
 
