@@ -2,16 +2,26 @@ import pickle
 from abc import ABC
 
 
+class SerializeData(ABC):
+    def serialize(self, data):
+        """Сериализация данных."""
+        pass
+
+    def deserialize(self, data):
+        """Распаковка данных."""
+        pass
+
+
+class PickleSerializeData(SerializeData):
+    def serialize(self, data):
+        return pickle.dumps(data)
+
+    def deserialize(self, data):
+        return pickle.loads(data)
+
+
 class CacheBackend(ABC):
     """Интерфейс для класса, реализующего методы кэширования."""
-
-    def create_key(self, data):
-        """Создание ключа."""
-        pass
-
-    def create_value(self, data):
-        """Создание данных."""
-        pass
 
     async def get_from_cache(self, key):
         """Получить данные из кэша."""
@@ -22,29 +32,14 @@ class CacheBackend(ABC):
         pass
 
 
-class RedisCache(CacheBackend):
+class RedisCache(CacheBackend, PickleSerializeData):
     """Кэш, реализует логику кэширования для запросов с query и filter."""
 
-    def create_key(self, data):
-        return pickle.dumps(data)
-
-    def create_value(self, data):
-        return pickle.dumps(data)
-
-    # todo: RedisCache управляет кэшом И подготавливает данные И создает ключ. => нарушение SRP.
-    @staticmethod
-    def preparation_data_for_key(index, data: dict):
-        """Подготовка данных для генерации ключа."""
-        data_copy = data.copy()
-        data_copy["index"] = index
-        return data_copy
-
     async def get_from_cache(self, key):
-        get_from_cache = await self.redis.get(key)
-        loads_objects_from_cache = None
-        if get_from_cache:
-            loads_objects_from_cache = pickle.loads(get_from_cache)
-        return loads_objects_from_cache
+        data_from_cache = await self.redis.get(key)
+        if data_from_cache:
+            return self.deserialize(data_from_cache)
 
     async def set_to_cache(self, key, value, expire):
+        value = self.serialize(value)
         await self.redis.set(key, value, expire=expire)
