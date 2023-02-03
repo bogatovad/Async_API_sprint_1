@@ -1,15 +1,15 @@
 import http
 import aiohttp
 import pytest
+from pytest_lazyfixture import lazy_fixture
 
-from ..conftest import generate_single_film
 from ..settings import test_settings
 from ..conftest import create_index
 
 
 
 @pytest.mark.parametrize(
-    'uuid_film, expected_answer',
+    'uuid_film, expected_answer, es_data',
     [
         (
             '12bb1b7e-b039-4f66-9248-b35d795e38f6',
@@ -29,16 +29,15 @@ from ..conftest import create_index
                     {'id': '333', 'name': 'Ben'},
                     {'id': '444', 'name': 'Howard'}
                 ],
-            }
+            },
+            lazy_fixture('generate_es_data')
         ),
     ]
 )
 @pytest.mark.asyncio
-async def test_get_film(es_client, es_write_data, uuid_film, expected_answer):
+async def test_get_film(es_client, es_write_data, uuid_film, expected_answer, es_data):
 
     await create_index(es_client)
-    es_data = generate_single_film()
-
     await es_write_data(es_data, 'movies')
 
     url = test_settings.SERVICE_URL + f'films/{uuid_film}'
