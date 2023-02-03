@@ -1,18 +1,11 @@
 import http
-
 import aiohttp
 import pytest
 
 from ..conftest import generate_single_film
 from ..settings import test_settings
-from ..utils.indexes import index_to_schema
 from ..conftest import create_index
 
-data_create_index = {
-    "index": 'movies',
-    "ignore": 400,
-    "body": index_to_schema.get('movies')
-}
 
 
 @pytest.mark.parametrize(
@@ -70,22 +63,55 @@ async def test_nonexistent_film(es_client):
     assert code == http.HTTPStatus.NOT_FOUND
 
 
+@pytest.mark.parametrize(
+    'expected_answer', ({'status': http.HTTPStatus.OK, 'length': 61},)
+)
 @pytest.mark.asyncio
-async def test_all_films(es_client, es_write_data, generate_es_data):
+async def test_all_films(es_client, es_write_data, generate_es_data, expected_answer):
     await create_index(es_client)
     await es_write_data(generate_es_data, 'movies')
 
-    url = test_settings.SERVICE_URL + 'films/?page[size]=60&page[number]=1'
+    url = test_settings.SERVICE_URL + 'films/?page[size]=61&page[number]=1'
 
     session = aiohttp.ClientSession()
     async with session.get(url) as response:
         code = response.status
         body = await response.json()
 
-    assert code == http.HTTPStatus.OK
-    assert len(body) == 60
+    assert code == expected_answer['status']
+    assert len(body) == expected_answer['length']
     for response_item, expected_item in zip(body, generate_es_data):
         assert (
             response_item['uuid'], response_item['title'], response_item['imdb_rating'] ==
             expected_item['id'], expected_item['title'], expected_item['imdb_rating']
         )
+
+
+@pytest.mark.parametrize(
+    'expected_answer',  ({'status': http.HTTPStatus.OK, 'length': 1},)
+)
+@pytest.mark.asyncio
+async def test_caching_all_films(es_client, redis_client, es_write_data, generate_es_data, expected_answer):
+    await create_index(es_client)
+    await es_write_data(generate_es_data, 'movies')
+
+    # Очистим кэш перед запросом.
+    keys = await redis_client.keys(pattern='*')
+    for key in keys:
+        await redis_client.delete(key)
+
+    keys = await redis_client.keys(pattern='*')
+    # Проверим что кэш пустой.
+    assert len(keys) == 0
+
+    # Делаем первый раз запрос.
+    url = test_settings.SERVICE_URL + 'films/?page[size]=61&page[number]=1'
+
+    session = aiohttp.ClientSession()
+    async with session.get(url) as response:
+        code = response.status
+
+    keys = await redis_client.keys('*')
+
+    assert code == expected_answer['status']
+    assert len(keys) == expected_answer['length']
