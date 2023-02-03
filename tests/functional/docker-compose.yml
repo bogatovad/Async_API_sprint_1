@@ -19,7 +19,6 @@ services:
       sh -c "pip install -r /fastapi/tests/requirements.txt
       && python3 /fastapi/tests/utils/wait_for_es.py
       && python /fastapi/main.py"
-#      && pytest /fastapi/tests/src"
 
   redis:
     image: redis:7-alpine
