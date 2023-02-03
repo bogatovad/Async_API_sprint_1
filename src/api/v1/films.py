@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from api.v1.models.film import FilmDescriptionResponse, FilmResponse
 from core.messages import ErrorMessage
 from services.film import FilmService, get_film_service
+from fastapi import Request
 
 router = APIRouter()
 
@@ -17,6 +18,7 @@ router = APIRouter()
     response_description='Список фильмов на главной странице'
 )
 async def search_films(
+        request: Request,
         page_size: Optional[int] = Query(10, alias='page[size]', description='Items amount on page', ge=1),
         page_number: Optional[int] = Query(1, alias='page[number]', description='Page number for pagination', ge=1),
         query: Optional[str] = Query('', description='Search string for query.'),
@@ -26,7 +28,8 @@ async def search_films(
         page_size=page_size,
         page_number=page_number,
         query=query,
-        sort=sort
+        sort=sort,
+        request=request
     )
     films = await film_service.get_search(query_params)
     if not films:
@@ -40,8 +43,16 @@ async def search_films(
     description='Получить информацию о фильме',
     response_description='Подробная информация о фильме'
 )
-async def film_details(film_id: str, film_service: FilmService = Depends(get_film_service)) -> FilmDescriptionResponse:
-    film = await film_service.get_by_id(film_id)
+async def film_details(
+        request: Request,
+        film_id: str,
+        film_service: FilmService = Depends(get_film_service)
+) -> FilmDescriptionResponse:
+    query_params = dict(
+        film_id=film_id,
+        request=request
+    )
+    film = await film_service.get_by_id(query_params)
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=ErrorMessage.FILM_NOT_FOUND)
     return FilmDescriptionResponse(
@@ -63,16 +74,18 @@ async def film_details(film_id: str, film_service: FilmService = Depends(get_fil
     response_description='Список фильмов на главной странице'
 )
 async def list_films(
+    request: Request,
     page_size: Optional[int] = Query(10, alias='page[size]', description='Items amount on page', ge=1),
     page_number: Optional[int] = Query(1, alias='page[number]', description='Page number for pagination', ge=1),
     sort: Optional[str] = Query('imdb_rating', description='Field for sorting.'),
     filter_genre: Optional[str] = Query('',  alias="filter[genre]", description='Field for filtering.'),
-    film_service: FilmService = Depends(get_film_service),
+    film_service: FilmService = Depends(get_film_service)
 ) -> List[FilmResponse]:
     query_params = dict(
         page_size=page_size,
         page_number=page_number,
-        sort=sort
+        sort=sort,
+        request=request
     )
     query_params['filter[genre]'] = filter_genre
     films = await film_service.get_all_films(query_params)
@@ -88,10 +101,22 @@ async def list_films(
     response_description='Список похожих фильмов'
 )
 async def films_alike(
+        request: Request,
         film_id: str = Path(None, description='id фильма, для которого ищем похожие'),
         film_service: FilmService = Depends(get_film_service)
 ) -> list[FilmResponse]:
-    films = await film_service.get_films_alike(film_id)
+    query_params = dict(
+        film_id=film_id,
+        request=request
+    )
+    films = await film_service.get_films_alike(query_params)
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=ErrorMessage.FILM_NOT_FOUND)
-    return [FilmResponse(uuid=film.id, title=film.title, imdb_rating=film.imdb_rating) for film in films]
+    return [
+        FilmResponse(
+            uuid=film.id,
+            title=film.title,
+            imdb_rating=film.imdb_rating
+        )
+        for film in films
+    ]

@@ -1,16 +1,14 @@
-import pickle
 from functools import lru_cache
 
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
 
-from core.config import settings
 from db.elastic import get_elastic
 from db.redis import get_redis
 from models.film import FilmShort
 from models.person import PersonDescription
-from services.cache_backend import RedisCache
+from services.cache_backend import RedisCache, cache
 from services.paginator import Paginator
 from services.utils import es_search_template
 
@@ -21,16 +19,20 @@ class PersonService(Paginator, RedisCache):
         self.elastic = elastic
         self.index = "persons"
 
-    async def search_persons(self, query_params):
-        page, body = es_search_template(self.index, query_params)
-        data_for_key = self.preparation_data_for_key(self.index, query_params)
-        key_person_search = self.create_key(data_for_key)
-        loads_persons = await self.get_from_cache(key_person_search)
-        if not loads_persons:
-            loads_persons = await self.paginator(self.index, body, page)
-            value = self.create_value(loads_persons)
-            await self.set_to_cache(key_person_search, value, settings.PERSON_CACHE_EXPIRE_IN_SECONDS)
-        return [await self.get_by_id(person['_source']['id']) for person in loads_persons]
+    @cache
+    async def search_persons(self, *args, **kwargs):
+        page, body = es_search_template(self.index, *args)
+        loads_persons = await self.paginator(self.index, body, page)
+        params, _ = args
+        return [
+            await self.get_by_id(
+                dict(
+                    person_id=person['_source']['id'],
+                    request=params[0].get('request')
+                )
+            )
+            for person in loads_persons
+        ]
 
     async def get_film_by_id(self, person_id: str):
         body = {
@@ -98,44 +100,23 @@ class PersonService(Paginator, RedisCache):
         movies_director = [movie['_source']['id'] for movie in docs_director['hits']['hits']]
         return count_movies_director, movies_director
 
-    async def _get_actors_from_cache_or_elastic(self, person_id: str):
-        key_movies_actors = f"movies_actors_{person_id}"
-        data_movies_actors = await self.redis.get(key_movies_actors)
-        if data_movies_actors:
-            person, count_movies_actor, movies_actor = pickle.loads(data_movies_actors)
-        else:
-            person, count_movies_actor, movies_actor = await self._get_movies_actors(person_id)
-            await self.redis.set(key_movies_actors, pickle.dumps([person, count_movies_actor, movies_actor]),
-                                 expire=settings.PERSON_CACHE_EXPIRE_IN_SECONDS)
-        return person, count_movies_actor, movies_actor
+    async def _get_actors_from_cache_or_elastic(self, *args, **kwargs):
+        params, _ = args
+        return await self._get_movies_actors(params[0].get('person_id'))
 
-    async def _get_writers_from_cache_or_elastic(self, person_id: str):
-        key_movies_writers = f"movies_writers_{person_id}"
-        data_movies_writers = await self.redis.get(key_movies_writers)
-        if data_movies_writers:
-            count_movies_writers, movies_writer = pickle.loads(data_movies_writers)
-        else:
-            count_movies_writers, movies_writer = await self._get_movies_writers(person_id)
-            await self.redis.set(key_movies_writers, pickle.dumps([count_movies_writers, movies_writer]),
-                                 expire=settings.PERSON_CACHE_EXPIRE_IN_SECONDS)
-        return count_movies_writers, movies_writer
+    async def _get_writers_from_cache_or_elastic(self, *args, **kwargs):
+        params, _ = args
+        return await self._get_movies_writers(params[0].get('person_id'))
 
-    async def _get_directors_from_cache_or_elastic(self, person_id: str, full_name: str):
-        key_movies_directors = f"movies_directors_{person_id}"
-        data_movies_directors = await self.redis.get(key_movies_directors)
-        if data_movies_directors:
-            count_movies_director, movies_director = pickle.loads(data_movies_directors)
-        else:
-            count_movies_director, movies_director = await self._get_movies_directors(full_name)
-            await self.redis.set(key_movies_directors, pickle.dumps([count_movies_director, movies_director]),
-                                 expire=settings.PERSON_CACHE_EXPIRE_IN_SECONDS)
-        return count_movies_director, movies_director
+    async def _get_directors_from_cache_or_elastic(self, full_name: str):
+        return await self._get_movies_directors(full_name)
 
-    async def get_by_id(self, person_id: str):
-        person, count_movies_actor, movies_actor = await self._get_actors_from_cache_or_elastic(person_id)
-        count_movies_writers, movies_writer = await self._get_writers_from_cache_or_elastic(person_id)
+    @cache
+    async def get_by_id(self, *args, **kwargs):
+        person, count_movies_actor, movies_actor = await self._get_actors_from_cache_or_elastic(*args)
+        count_movies_writers, movies_writer = await self._get_writers_from_cache_or_elastic(*args)
         full_name = person['_source']['full_name']
-        count_movies_director, movies_director = await self._get_directors_from_cache_or_elastic(person_id, full_name)
+        count_movies_director, movies_director = await self._get_directors_from_cache_or_elastic(full_name)
         film_ids = list(set(movies_actor + movies_writer + movies_director))
         role = [
             role[0] for role in (

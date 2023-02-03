@@ -1,5 +1,7 @@
-def es_search_template(index, query_params: dict) -> dict:
+def es_search_template(*args, **kwargs) -> dict:
     """Шаблон для построения поисковых запросов к elasticsearch."""
+    index, query_params, _ = args
+    query_params = query_params[0]
     page_size_default = 50
     number_page_default = 1
 
