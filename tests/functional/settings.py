@@ -1,6 +1,7 @@
 import backoff
 from pydantic import BaseSettings, Field
 
+
 backoff_config = {
     'wait_gen': backoff.expo,
     'exception': Exception,
