@@ -55,7 +55,7 @@ def get_es_bulk_query(es_data, es_index, es_id_field):
 @pytest.fixture
 def es_write_data(es_client):
     async def inner(data: list[dict], es_index: str):
-        bulk_query = get_es_bulk_query(data, es_index, test_settings.ES_ID_FIELD)
+        bulk_query = get_es_bulk_query(data, es_index, test_settings.es_id_field)
         response = await es_client.bulk(bulk_query, refresh=True)
         if response['errors']:
             raise Exception(f'Ошибка записи данных в Elasticsearch')
@@ -65,7 +65,7 @@ def es_write_data(es_client):
 @pytest.fixture
 def make_get_request(session):
     async def inner(endpoint: str, params: dict = {}) -> HTTPResponse:
-        url = f"{test_settings.SERVICE_URL}{endpoint}"
+        url = f"{test_settings.service_url}{endpoint}"
         print(url)
         async with session.get(url, params=params) as response:
             return HTTPResponse(
