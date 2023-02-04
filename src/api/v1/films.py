@@ -7,6 +7,7 @@ from api.v1.models.film import FilmDescriptionResponse, FilmResponse
 from core.messages import ErrorMessage
 from services.film import FilmService, get_film_service
 from fastapi import Request
+from api.v1.common_paramaters import paginated_params
 
 router = APIRouter()
 
@@ -19,14 +20,12 @@ router = APIRouter()
 )
 async def search_films(
         request: Request,
-        page_size: Optional[int] = Query(10, alias='page[size]', description='Items amount on page', ge=1),
-        page_number: Optional[int] = Query(1, alias='page[number]', description='Page number for pagination', ge=1),
+        common: dict = Depends(paginated_params),
         query: Optional[str] = Query('', description='Search string for query.'),
         sort: Optional[str] = Query('imdb_rating', description='Field for sorting.'),
         film_service: FilmService = Depends(get_film_service)) -> List[FilmResponse]:
     query_params = dict(
-        page_size=page_size,
-        page_number=page_number,
+        **common,
         query=query,
         sort=sort,
         request=request
@@ -75,15 +74,13 @@ async def film_details(
 )
 async def list_films(
     request: Request,
-    page_size: Optional[int] = Query(10, alias='page[size]', description='Items amount on page', ge=1),
-    page_number: Optional[int] = Query(1, alias='page[number]', description='Page number for pagination', ge=1),
+    common: dict = Depends(paginated_params),
     sort: Optional[str] = Query('imdb_rating', description='Field for sorting.'),
     filter_genre: Optional[str] = Query('',  alias="filter[genre]", description='Field for filtering.'),
     film_service: FilmService = Depends(get_film_service)
 ) -> List[FilmResponse]:
     query_params = dict(
-        page_size=page_size,
-        page_number=page_number,
+        **common,
         sort=sort,
         request=request
     )

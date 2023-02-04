@@ -139,6 +139,7 @@ def generate_es_data():
     )
     return data
 
+
 @pytest.fixture
 def generate_es_data_genre():
     """Фикстура для генерации данных по жанрам."""
