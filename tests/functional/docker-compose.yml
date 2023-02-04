@@ -15,8 +15,7 @@ services:
       - .:/fastapi/tests
     entrypoint: >
       sh -c "pip install -r /fastapi/tests/requirements.txt
-      && python3 /fastapi/tests/utils/wait_for_es.py
-      && python3 /fastapi/tests/utils/wait_for_redis.py
+      && python3 /fastapi/tests/wait_for_services.py
       && pytest /fastapi/tests/src"
 
   redis:

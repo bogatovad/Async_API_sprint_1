@@ -17,7 +17,7 @@ class TestSettings(BaseSettings):
     ES_ID_FIELD: str = 'id'
     ES_INDEX_MAPPING: dict = {}
 
-    REDIS_HOST: str = 'http://redis'
+    REDIS_HOST: str = 'redis'
     SERVICE_URL: str = 'http://fastapi:8000/api/v1/'
 
 

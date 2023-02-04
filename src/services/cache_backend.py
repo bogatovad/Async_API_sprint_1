@@ -1,10 +1,10 @@
 from abc import ABC
-from typing import Callable, Optional
+from typing import Callable
 from models.film import Film
 from core.config import settings
 from services.serializer import PickleSerializeData
 
-ResponseType = Optional[Film | list[Film]]
+ResponseType = Film | list[Film] | None
 
 
 class CacheBackend(ABC):
