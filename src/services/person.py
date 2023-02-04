@@ -2,10 +2,10 @@ from functools import lru_cache
 
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch
+from fastapi import Depends
 
 from db.elastic import get_elastic
 from db.redis import get_redis
-from fastapi import Depends
 from models.film import FilmShort
 from models.person import PersonDescription
 from services.cache_backend import RedisCache, cache

@@ -1,5 +1,5 @@
 import json
-import uuid
+from glob import glob
 
 import aiohttp
 import aioredis
@@ -59,7 +59,7 @@ def es_write_data(es_client):
         bulk_query = get_es_bulk_query(data, es_index, test_settings.es_id_field)
         response = await es_client.bulk(bulk_query, refresh=True)
         if response['errors']:
-            raise Exception('Ошибка записи данных в Elasticsearch')
+            raise Exception(f'Ошибка записи данных в Elasticsearch')
     return inner
 
 
@@ -67,99 +67,12 @@ def es_write_data(es_client):
 def make_get_request(session):
     async def inner(endpoint: str, params: dict = {}) -> HTTPResponse:
         url = f"{test_settings.service_url}{endpoint}"
-        print(url)
         async with session.get(url, params=params) as response:
             return HTTPResponse(
                 body=await response.json(),
                 status=response.status,
             )
-
     return inner
-
-
-@pytest.fixture
-def generate_es_data_person():
-    """Фикстура для генерации данных по персонажам."""
-    persons = [
-        {
-            'id': str(uuid.uuid4()),
-            'full_name': 'Petr Ivanov',
-        }
-        for _ in range(60)
-    ]
-    persons.extend([
-        {'id': '42b40c6b-4d07-442f-b652-4ec1ee8b57gg', 'full_name': 'Ivan Petrov'}
-    ])
-    return persons
-
-
-@pytest.fixture
-def generate_es_data():
-    """Фикстура для генерации данных по фильмам."""
-    data = [
-        {
-            'id': str(uuid.uuid4()),
-            'imdb_rating': 8.5,
-            'genre': ['Action', 'Sci-Fi'],
-            'title': 'The Star',
-            'description': 'New World',
-            'director': ['Stan'],
-            'actors_names': ['Ann', 'Bob'],
-            'writers_names': ['Ben', 'Howard'],
-            'actors': [
-                {'id': '111', 'name': 'Ann'},
-                {'id': '222', 'name': 'Bob'},
-            ],
-            'writers': [
-                {'id': '333', 'name': 'Ben'},
-                {'id': '444', 'name': 'Howard'}
-            ],
-        }
-        for _ in range(60)
-    ]
-    data.append(
-        {
-            'id': str('12bb1b7e-b039-4f66-9248-b35d795e38f6'),
-            'imdb_rating': 8.5,
-            'genre': ['Action', 'Sci-Fi'],
-            'title': 'The Star',
-            'description': 'New World',
-            'director': ['Stan'],
-            'actors_names': ['Ann', 'Bob'],
-            'writers_names': ['Ben', 'Howard'],
-            'actors': [
-                {'id': '111', 'name': 'Ann'},
-                {'id': '222', 'name': 'Bob'},
-
-            ],
-            'writers': [
-                {'id': '333', 'name': 'Ben'},
-                {'id': '444', 'name': 'Howard'}
-            ],
-        }
-    )
-    return data
-
-
-@pytest.fixture
-def generate_es_data_genre():
-    """Фикстура для генерации данных по жанрам."""
-    genres = [
-            {
-                'id': str(uuid.uuid4()),
-                'name': 'Thriller',
-                'description': 'Thrilling and scary'
-            }
-            for _ in range(9)
-        ]
-    genres.append(
-        {
-            'id': '9c91a5b2-eb70-4889-8581-ebe427370edd',
-            'name': 'Musical',
-            'description': 'Nice and dancy'
-        }
-    )
-    return genres
 
 
 async def create_index(es_client):
@@ -175,7 +88,10 @@ async def create_index(es_client):
         )
 
 
-@pytest.fixture
-def generate_expected_answer_for_all_films(generate_es_data):
-    data = generate_es_data
-    return [(item['id'], item['title'], item['imdb_rating']) for item in data]
+def refactor(string: str) -> str:
+    return string.replace("/", ".").replace("\\", ".").replace(".py", "")
+
+
+pytest_plugins = [
+    refactor(fixture) for fixture in glob("tests/fixtures/*.py") if "__" not in fixture
+]

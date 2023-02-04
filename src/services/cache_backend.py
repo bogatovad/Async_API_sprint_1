@@ -1,6 +1,6 @@
 from abc import ABC
 from typing import Callable
-from models.film import Film
+
 from core.config import settings
 from models.film import Film
 from services.serializer import PickleSerializeData
