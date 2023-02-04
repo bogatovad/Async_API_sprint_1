@@ -1,7 +1,7 @@
-import backoff
 import time
 
-from redis import Redis, ConnectionError
+import backoff
+from redis import ConnectionError, Redis
 
 
 #@backoff.on_exception(**backoff_config)

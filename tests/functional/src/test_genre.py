@@ -1,11 +1,9 @@
 from http import HTTPStatus
 
-import aiohttp
 import pytest
 from pytest_lazyfixture import lazy_fixture
 
 from ..conftest import create_index
-from ..settings import test_settings
 
 
 @pytest.mark.parametrize(

@@ -5,8 +5,9 @@ import aiohttp
 import aioredis
 import pytest
 import requests
-from core.config import settings
 from elasticsearch import AsyncElasticsearch
+
+from core.config import settings
 
 from .settings import test_settings
 from .utils.indexes import index_to_schema
@@ -20,7 +21,7 @@ def delete_data_from_elastic(url_elastic: str, urls: list[str]) -> None:
 
 @pytest.fixture(scope='function')
 async def es_client():
-    url_elastic: str = f'http://{settings.ELASTIC_HOST}:{settings.ELASTIC_PORT}'
+    url_elastic: str = f'http://{settings.elastic_host}:{settings.elastic_port}'
     client = AsyncElasticsearch(hosts=url_elastic)
     yield client
     await client.close()
@@ -29,8 +30,8 @@ async def es_client():
 
 @pytest.fixture
 async def redis_client():
-    redis_host: str = settings.REDIS_HOST
-    redis_port: str = settings.REDIS_PORT
+    redis_host: str = settings.redis_host
+    redis_port: str = settings.redis_port
     redis = await aioredis.create_redis_pool((redis_host, redis_port), minsize=10, maxsize=20)
     yield redis
 
@@ -58,7 +59,7 @@ def es_write_data(es_client):
         bulk_query = get_es_bulk_query(data, es_index, test_settings.es_id_field)
         response = await es_client.bulk(bulk_query, refresh=True)
         if response['errors']:
-            raise Exception(f'Ошибка записи данных в Elasticsearch')
+            raise Exception('Ошибка записи данных в Elasticsearch')
     return inner
 
 
@@ -138,6 +139,7 @@ def generate_es_data():
         }
     )
     return data
+
 
 @pytest.fixture
 def generate_es_data_genre():
