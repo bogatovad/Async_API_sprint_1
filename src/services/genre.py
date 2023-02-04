@@ -2,12 +2,12 @@ from functools import lru_cache
 
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch, NotFoundError
-from fastapi import Depends
 
 from db.elastic import get_elastic
 from db.redis import get_redis
+from fastapi import Depends
 from models.genre import Genre
-from services.cache_backend import cache, RedisCache
+from services.cache_backend import RedisCache, cache
 
 
 class GenreService(RedisCache):

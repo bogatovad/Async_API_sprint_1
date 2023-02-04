@@ -1,7 +1,8 @@
 from abc import ABC
 from typing import Callable, Optional
-from models.film import Film
+
 from core.config import settings
+from models.film import Film
 from services.serializer import PickleSerializeData
 
 ResponseType = Optional[Film | list[Film]]
@@ -52,6 +53,6 @@ def cache(get_data_from_elastic: Callable[..., ResponseType]) -> Callable[..., R
         data = await get_data_from_elastic(self, args, kwargs)
 
         # Сохранили данные в кэш.
-        await self.set_to_cache(key, data, settings.FILM_CACHE_EXPIRE_IN_SECONDS)
+        await self.set_to_cache(key, data, settings.film_cache_expire_in_seconds)
         return data
     return wrapper

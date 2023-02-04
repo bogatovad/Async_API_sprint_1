@@ -23,7 +23,7 @@ async def test_get_person(es_client, es_write_data, uuid_person, expected_answer
     await create_index(es_client)
     await es_write_data(es_data, 'persons')
     session = aiohttp.ClientSession()
-    url = test_settings.SERVICE_URL + f'persons/{uuid_person}'
+    url = test_settings.service_url + f'persons/{uuid_person}'
 
     async with session.get(url) as response:
         body = await response.json()

@@ -40,7 +40,7 @@ async def test_get_film(es_client, es_write_data, uuid_film, expected_answer, es
     await create_index(es_client)
     await es_write_data(es_data, 'movies')
 
-    url = test_settings.SERVICE_URL + f'films/{uuid_film}'
+    url = test_settings.service_url + f'films/{uuid_film}'
 
     session = aiohttp.ClientSession()
     async with session.get(url) as response:
@@ -53,7 +53,7 @@ async def test_get_film(es_client, es_write_data, uuid_film, expected_answer, es
 @pytest.mark.asyncio
 async def test_nonexistent_film(es_client):
 
-    url = test_settings.SERVICE_URL + 'films/nonexistentfilm'
+    url = test_settings.service_url + 'films/nonexistentfilm'
 
     session = aiohttp.ClientSession()
     async with session.get(url) as response:
@@ -71,7 +71,7 @@ async def test_all_films(es_client, es_write_data, generate_es_data, expected_an
     await create_index(es_client)
     await es_write_data(generate_es_data, 'movies')
 
-    url = test_settings.SERVICE_URL + 'films/?page[size]=61&page[number]=1'
+    url = test_settings.service_url + 'films/?page[size]=61&page[number]=1'
 
     session = aiohttp.ClientSession()
     async with session.get(url) as response:
@@ -105,7 +105,7 @@ async def test_caching_all_films(es_client, redis_client, es_write_data, generat
     assert len(keys) == 0
 
     # Делаем первый раз запрос.
-    url = test_settings.SERVICE_URL + 'films/?page[size]=61&page[number]=1'
+    url = test_settings.service_url + 'films/?page[size]=61&page[number]=1'
 
     session = aiohttp.ClientSession()
     async with session.get(url) as response:
