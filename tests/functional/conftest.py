@@ -5,8 +5,9 @@ import aiohttp
 import aioredis
 import pytest
 import requests
-from core.config import settings
 from elasticsearch import AsyncElasticsearch
+
+from core.config import settings
 
 from .settings import test_settings
 from .utils.indexes import index_to_schema
@@ -20,7 +21,7 @@ def delete_data_from_elastic(url_elastic: str, urls: list[str]) -> None:
 
 @pytest.fixture(scope='function')
 async def es_client():
-    url_elastic: str = f'http://{settings.ELASTIC_HOST}:{settings.ELASTIC_PORT}'
+    url_elastic: str = f'http://{settings.elastic_host}:{settings.elastic_port}'
     client = AsyncElasticsearch(hosts=url_elastic)
     yield client
     await client.close()
@@ -29,8 +30,8 @@ async def es_client():
 
 @pytest.fixture
 async def redis_client():
-    redis_host: str = settings.REDIS_HOST
-    redis_port: str = settings.REDIS_PORT
+    redis_host: str = settings.redis_host
+    redis_port: str = settings.redis_port
     redis = await aioredis.create_redis_pool((redis_host, redis_port), minsize=10, maxsize=20)
     yield redis
 
@@ -55,17 +56,17 @@ def get_es_bulk_query(es_data, es_index, es_id_field):
 @pytest.fixture
 def es_write_data(es_client):
     async def inner(data: list[dict], es_index: str):
-        bulk_query = get_es_bulk_query(data, es_index, test_settings.ES_ID_FIELD)
+        bulk_query = get_es_bulk_query(data, es_index, test_settings.es_id_field)
         response = await es_client.bulk(bulk_query, refresh=True)
         if response['errors']:
-            raise Exception(f'Ошибка записи данных в Elasticsearch')
+            raise Exception('Ошибка записи данных в Elasticsearch')
     return inner
 
 
 @pytest.fixture
 def make_get_request(session):
     async def inner(endpoint: str, params: dict = {}) -> HTTPResponse:
-        url = f"{test_settings.SERVICE_URL}{endpoint}"
+        url = f"{test_settings.service_url}{endpoint}"
         print(url)
         async with session.get(url, params=params) as response:
             return HTTPResponse(
@@ -138,6 +139,7 @@ def generate_es_data():
         }
     )
     return data
+
 
 @pytest.fixture
 def generate_es_data_genre():
