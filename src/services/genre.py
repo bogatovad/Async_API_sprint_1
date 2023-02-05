@@ -7,7 +7,7 @@ from db.elastic import get_elastic
 from db.redis import get_redis
 from fastapi import Depends
 from models.genre import Genre
-from services.cache_backend import RedisCache, cache
+from services.cache_backend import RedisCache, cache, AsyncCacheStorage
 
 
 class GenreService(RedisCache):
@@ -42,7 +42,7 @@ class GenreService(RedisCache):
 
 @lru_cache()
 def get_genre_service(
-        redis: Redis = Depends(get_redis),
+        cache: AsyncCacheStorage = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> GenreService:
-    return GenreService(redis, elastic)
+    return GenreService(cache, elastic)

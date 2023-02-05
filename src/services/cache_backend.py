@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Callable
 from models.film import Film
 from core.config import settings
@@ -17,6 +17,16 @@ class CacheBackend(ABC):
 
     async def set_to_cache(self, key, value, expire):
         """Положить данные в кэш."""
+        pass
+
+
+class AsyncCacheStorage(ABC):
+    @abstractmethod
+    async def get(self, key: str, **kwargs):
+        pass
+
+    @abstractmethod
+    async def set(self, key: str, value: str, expire: int, **kwargs):
         pass
 
 
