@@ -43,6 +43,7 @@ class GenreService(RedisCache):
 @lru_cache()
 def get_genre_service(
         cache: AsyncCacheStorage = Depends(get_redis),
+        #cache: RedisCache = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> GenreService:
     return GenreService(cache, elastic)
