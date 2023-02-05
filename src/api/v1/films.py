@@ -50,7 +50,7 @@ async def film_details(
         film_id=film_id,
         request=request
     )
-    film = await film_service.get_by_id(query_params)
+    film = await film_service.get_data_by_id(query_params)
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=ErrorMessage.FILM_NOT_FOUND)
     return FilmDescriptionResponse(

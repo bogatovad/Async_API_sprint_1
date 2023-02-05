@@ -24,7 +24,7 @@ async def genre_details(
         genre_id=genre_id,
         request=request
     )
-    genre = await genre_service.get_by_id(query_params)
+    genre = await genre_service.get_data_by_id(query_params)
     if not genre:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=ErrorMessage.GENRE_NOT_FOUND)
     return GenreResponse(uuid=genre.id, name=genre.name)
@@ -43,7 +43,7 @@ async def list_genres(
     query_params = dict(
         request=request
     )
-    genres = await genre_service.get_list(query_params)
+    genres = await genre_service.get_data_list(query_params)
     if not genres:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=ErrorMessage.GENRES_NOT_FOUND)
     return [GenreResponse(uuid=genre.id, name=genre.name) for genre in genres]

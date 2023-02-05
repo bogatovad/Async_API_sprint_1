@@ -1,49 +1,33 @@
 from functools import lru_cache
 
 from aioredis import Redis
-from elasticsearch import AsyncElasticsearch, NotFoundError
+from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
 
 from db.elastic import get_elastic
 from db.redis import get_redis
-from models.genre import Genre
 from services.cache_backend import RedisCache, cache, AsyncCacheStorage
+from services.data_storage import AsyncElasticDataStorage
 
 
-class GenreService(RedisCache):
+class GenreService(RedisCache, AsyncElasticDataStorage):
     def __init__(self, redis: Redis, elastic: AsyncElasticsearch):
         self.redis = redis
         self.elastic = elastic
+        self.index = 'genres'
 
     @cache
-    async def get_by_id(self, *args, **kwargs):
-        return await self._get_genre_from_elastic(*args)
-
-    async def _get_genre_from_elastic(self, *args, **kwargs) -> Genre | None:
-        params, _ = args
-        try:
-            doc = await self.elastic.get('genres', params[0].get("genre_id"))
-        except NotFoundError:
-            return None
-        doc = doc['_source']
-        return Genre(**doc)
+    async def get_data_by_id(self, *args, **kwargs):
+        return await self.get_by_id(*args, **kwargs)
 
     @cache
-    async def get_list(self, *args, **kwargs):
-        return await self._get_genre_list_from_elastic()
-
-    async def _get_genre_list_from_elastic(self) -> list[Genre] | None:
-        try:
-            docs = await self.elastic.search(index="genres", body={"query": {"match_all": {}}})
-        except NotFoundError:
-            return []
-        return [Genre(**genre['_source']) for genre in docs['hits']['hits']]
+    async def get_data_list(self, *args, **kwargs):
+        return await self.get_list(*args, **kwargs)
 
 
 @lru_cache()
 def get_genre_service(
         cache: AsyncCacheStorage = Depends(get_redis),
-        #cache: RedisCache = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> GenreService:
     return GenreService(cache, elastic)

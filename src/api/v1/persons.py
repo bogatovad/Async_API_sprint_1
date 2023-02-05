@@ -58,7 +58,7 @@ async def person_details(
         person_id=person_id,
         request=request
     )
-    person = await person_service.get_by_id(query_params)
+    person = await person_service.get_data_by_id(query_params)
     if not person:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=ErrorMessage.PERSON_NOT_FOUND)
     return PersonDescriptionResponse(uuid=person.id, role=person.role, film_ids=person.film_ids, name=person.full_name)
@@ -72,10 +72,15 @@ async def person_details(
 
 )
 async def list_film_by_person(
+        request: Request,
         person_id: str,
         person_service: PersonService = Depends(get_person_service)
 ) -> list[FilmResponse]:
-    films = await person_service.get_film_by_id(person_id)
+    query_params = dict(
+        person_id=person_id,
+        request=request
+    )
+    films = await person_service.get_film_by_id(query_params)
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=ErrorMessage.PERSON_FILMWORK_NOT_FOUND)
     return [FilmResponse(uuid=film.id, title=film.title, imdb_rating=film.imdb_rating) for film in films]

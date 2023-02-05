@@ -1,11 +1,19 @@
 import backoff
 from pydantic import BaseSettings, Field
+from elasticsearch import ConnectionError
 
-backoff_config = {
+common_backoff_config = {
     'wait_gen': backoff.expo,
-    'exception': Exception,
     'max_tries': 3600,
     'raise_on_giveup': False
+}
+
+exception_redis = {
+    'exception': Exception,
+}
+
+exception_es = {
+    'exception': ConnectionError,
 }
 
 
