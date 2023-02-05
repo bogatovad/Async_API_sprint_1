@@ -8,7 +8,7 @@ from fastapi import Depends
 from db.elastic import get_elastic
 from db.redis import get_redis
 from models.film import Film
-from services.cache_backend import RedisCache, cache
+from services.cache_backend import RedisCache, cache, AsyncCacheStorage
 from services.paginator import Paginator
 from services.utils import es_search_template
 
@@ -74,7 +74,7 @@ class FilmService(Paginator, RedisCache):
 
 @lru_cache()
 def get_film_service(
-        redis: Redis = Depends(get_redis),
+        cache: AsyncCacheStorage = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> FilmService:
-    return FilmService(redis, elastic)
+    return FilmService(cache, elastic)
