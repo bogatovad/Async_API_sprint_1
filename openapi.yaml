@@ -284,7 +284,7 @@ paths:
     get:
       tags:
         - persons
-      summary: Person Details
+      summary: Информация о персонах
       description: Получить информацию о персоне
       operationId: person_details_api_v1_persons__person_id__get
       parameters:
@@ -311,7 +311,7 @@ paths:
     get:
       tags:
         - persons
-      summary: List Film By Person
+      summary: Список фильмов с персоной
       description: Получить фильмы по персоне.
       operationId: list_film_by_person_api_v1_persons__person_id__film_get
       parameters:
