@@ -1,0 +1,481 @@
+openapi: 3.0.2
+info:
+  title: movies
+  version: 0.1.0
+paths:
+  /api/v1/films/search:
+    get:
+      tags:
+        - films
+      summary: Поиск фильмов
+      operationId: search_films_api_v1_films_search_get
+      parameters:
+        - description: Items amount on page
+          required: false
+          schema:
+            title: Page[Size]
+            minimum: 1
+            type: integer
+            description: Items amount on page
+            default: 10
+          name: page[size]
+          in: query
+        - description: Page number for pagination
+          required: false
+          schema:
+            title: Page[Number]
+            minimum: 1
+            type: integer
+            description: Page number for pagination
+            default: 1
+          name: page[number]
+          in: query
+        - description: Search string for query.
+          required: false
+          schema:
+            title: Query
+            type: string
+            description: Search string for query.
+            default: ''
+          name: query
+          in: query
+        - description: Field for sorting.
+          required: false
+          schema:
+            title: Sort
+            type: string
+            description: Field for sorting.
+            default: imdb_rating
+          name: sort
+          in: query
+      responses:
+        '200':
+          description: Результат поиска по фильмам
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FilmResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/films/{film_id}:
+    get:
+      tags:
+        - films
+      summary: Подробности о фильме
+      description: Получить информацию о фильме
+      operationId: film_details_api_v1_films__film_id__get
+      parameters:
+        - required: true
+          schema:
+            title: Film Id
+            type: string
+          name: film_id
+          in: path
+      responses:
+        '200':
+          description: Подробная информация о фильме
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilmDescriptionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/films/:
+    get:
+      tags:
+        - films
+      summary: Список фильмов на главной странице
+      description: Главная страница
+      operationId: list_films_api_v1_films__get
+      parameters:
+        - description: Items amount on page
+          required: false
+          schema:
+            title: Page[Size]
+            minimum: 1
+            type: integer
+            description: Items amount on page
+            default: 10
+          name: page[size]
+          in: query
+        - description: Page number for pagination
+          required: false
+          schema:
+            title: Page[Number]
+            minimum: 1
+            type: integer
+            description: Page number for pagination
+            default: 1
+          name: page[number]
+          in: query
+        - description: Field for sorting.
+          required: false
+          schema:
+            title: Sort
+            type: string
+            description: Field for sorting.
+            default: imdb_rating
+          name: sort
+          in: query
+        - description: Field for filtering.
+          required: false
+          schema:
+            title: Filter[Genre]
+            type: string
+            description: Field for filtering.
+            default: ''
+          name: filter[genre]
+          in: query
+      responses:
+        '200':
+          description: Список фильмов на главной странице
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FilmResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/films/alike/{film_id}:
+    get:
+      tags:
+        - films
+      summary: Похожие фильмы
+      description: Получить похожие фильмы
+      operationId: films_alike_api_v1_films_alike__film_id__get
+      parameters:
+        - description: id фильма, для которого ищем похожие
+          required: true
+          schema:
+            title: Film Id
+            type: string
+            description: id фильма, для которого ищем похожие
+          name: film_id
+          in: path
+      responses:
+        '200':
+          description: Список похожих фильмов
+          content:
+            application/json:
+              schema:
+                title: Response Films Alike Api V1 Films Alike  Film Id  Get
+                type: array
+                items:
+                  $ref: '#/components/schemas/FilmResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/genres/{genre_id}:
+    get:
+      tags:
+        - genres
+      summary: Информация о жанре
+      description: Получить информацию о жанре
+      operationId: genre_details_api_v1_genres__genre_id__get
+      parameters:
+        - required: true
+          schema:
+            title: Genre Id
+            type: string
+          name: genre_id
+          in: path
+      responses:
+        '200':
+          description: Подробная информация о жанре
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenreResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/genres/:
+    get:
+      tags:
+        - genres
+      summary: Список жанров
+      description: Список жанров
+      operationId: list_genres_api_v1_genres__get
+      responses:
+        '200':
+          description: Список жанров
+          content:
+            application/json:
+              schema:
+                title: Response List Genres Api V1 Genres  Get
+                type: array
+                items:
+                  $ref: '#/components/schemas/GenreResponse'
+  /api/v1/persons/search:
+    get:
+      tags:
+        - persons
+      summary: Поиск по персоне
+      description: Поиск по персоне
+      operationId: search_persons_api_v1_persons_search_get
+      parameters:
+        - description: Items amount on page
+          required: false
+          schema:
+            title: Page[Size]
+            minimum: 1
+            type: integer
+            description: Items amount on page
+            default: 10
+          name: page[size]
+          in: query
+        - description: Page number for pagination
+          required: false
+          schema:
+            title: Page[Number]
+            minimum: 1
+            type: integer
+            description: Page number for pagination
+            default: 1
+          name: page[number]
+          in: query
+        - description: Поисковой запрос
+          required: false
+          schema:
+            title: Query
+            type: string
+            description: Поисковой запрос
+            default: ''
+          name: query
+          in: query
+      responses:
+        '200':
+          description: Результат поиска
+          content:
+            application/json:
+              schema:
+                title: Список персон
+                type: array
+                items:
+                  $ref: '#/components/schemas/PersonDescriptionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/persons/{person_id}:
+    get:
+      tags:
+        - persons
+      summary: Информация о персонах
+      description: Получить информацию о персоне
+      operationId: person_details_api_v1_persons__person_id__get
+      parameters:
+        - required: true
+          schema:
+            title: Person Id
+            type: string
+          name: person_id
+          in: path
+      responses:
+        '200':
+          description: Подробная информация о персоне
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDescriptionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/persons/{person_id}/film:
+    get:
+      tags:
+        - persons
+      summary: Список фильмов с персоной
+      description: Получить фильмы по персоне.
+      operationId: list_film_by_person_api_v1_persons__person_id__film_get
+      parameters:
+        - required: true
+          schema:
+            title: Id персоны
+            type: string
+          name: person_id
+          in: path
+      responses:
+        '200':
+          description: Список фильмов с персоной
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FilmResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    FilmDescriptionResponse:
+      title: FilmDescriptionResponse
+      required:
+        - uuid
+        - title
+      type: object
+      properties:
+        uuid:
+          title: Uuid
+          type: string
+        title:
+          title: Title
+          type: string
+        imdb_rating:
+          title: Imdb Rating
+          type: number
+        description:
+          title: Description
+          type: string
+        genre:
+          title: Genre
+          type: array
+          items:
+            type: string
+        actors:
+          title: Actors
+          type: array
+          items:
+            $ref: '#/components/schemas/FilmPersonResponse'
+        writers:
+          title: Writers
+          type: array
+          items:
+            $ref: '#/components/schemas/FilmPersonResponse'
+        directors:
+          title: Directors
+          type: array
+          items:
+            type: string
+      description: |-
+        Полная информация по фильму.
+        Для ручки /api/v1/films/<uuid:UUID>/
+    FilmPersonResponse:
+      title: FilmPersonResponse
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        id:
+          title: Id
+          type: string
+        name:
+          title: Name
+          type: string
+    FilmResponse:
+      title: FilmResponse
+      required:
+        - uuid
+        - title
+      type: object
+      properties:
+        uuid:
+          title: Uuid
+          type: string
+        title:
+          title: Title
+          type: string
+        imdb_rating:
+          title: Imdb Rating
+          type: number
+      description: Модель ответа API с информацией о фильмах.
+    GenreResponse:
+      title: GenreResponse
+      required:
+        - uuid
+        - name
+      type: object
+      properties:
+        uuid:
+          title: Uuid
+          type: string
+        name:
+          title: Name
+          type: string
+    HTTPValidationError:
+      title: HTTPValidationError
+      type: object
+      properties:
+        detail:
+          title: Detail
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationError'
+    PersonDescriptionResponse:
+      title: PersonDescriptionResponse
+      required:
+        - uuid
+        - name
+        - role
+        - film_ids
+      type: object
+      properties:
+        uuid:
+          title: Uuid
+          type: string
+        name:
+          title: Name
+          type: string
+        role:
+          title: Role
+          type: array
+          items:
+            type: string
+        film_ids:
+          title: Film Ids
+          type: array
+          items:
+            type: string
+      description: |-
+        Данные по персоне.
+        Для ручки /api/v1/persons/<uuid:UUID>/
+    ValidationError:
+      title: ValidationError
+      required:
+        - loc
+        - msg
+        - type
+      type: object
+      properties:
+        loc:
+          title: Location
+          type: array
+          items:
+            type: string
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
