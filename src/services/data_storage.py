@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from elasticsearch import NotFoundError
 
 from models.film import Film, FilmShort

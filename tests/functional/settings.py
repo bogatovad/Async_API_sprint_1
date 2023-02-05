@@ -1,6 +1,6 @@
 import backoff
-from pydantic import BaseSettings, Field
 from elasticsearch import ConnectionError
+from pydantic import BaseSettings, Field
 
 common_backoff_config = {
     'wait_gen': backoff.expo,

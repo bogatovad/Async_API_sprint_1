@@ -22,19 +22,6 @@ class AsyncCacheStorage(ABC):
         pass
 
 
-class RedisCache(AsyncCacheStorage, PickleSerializeData):
-    """Кэш, реализует логику кэширования для запросов с query и filter."""
-
-    async def get(self, key):
-        data_from_cache = await self.redis.get(key)
-        if data_from_cache:
-            return self.deserialize(data_from_cache)
-
-    async def set(self, key, value, expire):
-        value = self.serialize(value)
-        await self.redis.set(key, value, expire=expire)
-
-
 def get_key(*args, **kwargs) -> str:
     """Генерация ключа для redis."""
     params,  = args
@@ -45,16 +32,19 @@ def get_key(*args, **kwargs) -> str:
 def cache(get_data_from_elastic: Callable[..., ResponseType]) -> Callable[..., ResponseType]:
     """Декоратор, осуществляющий кэширование запросов."""
     async def wrapper(self, *args, **kwargs):
+        serializer = PickleSerializeData()
+
         # Получили ключ.
         key = get_key(*args)
-        data = await self.get(key)
+
+        data = await self.cache_backend.get(key)
 
         if data is not None:
-            return data
+            return serializer.deserialize(data)
 
         data = await get_data_from_elastic(self, args, kwargs)
 
         # Сохранили данные в кэш.
-        await self.set(key, data, settings.film_cache_expire_in_seconds)
+        await self.cache_backend.set(key, serializer.serialize(data), expire=settings.film_cache_expire_in_seconds)
         return data
     return wrapper

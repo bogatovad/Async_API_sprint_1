@@ -7,14 +7,14 @@ from fastapi import Depends
 from db.elastic import get_elastic
 from db.redis import get_redis
 from models.person import PersonDescription
-from services.cache_backend import RedisCache, cache, AsyncCacheStorage
+from services.cache_backend import AsyncCacheStorage, cache
 from services.data_storage import AsyncElasticDataStorage
 from services.paginator import Paginator
 
 
-class PersonService(Paginator, RedisCache, AsyncElasticDataStorage):
-    def __init__(self, redis: Redis, elastic: AsyncElasticsearch):
-        self.redis = redis
+class PersonService(Paginator, AsyncElasticDataStorage):
+    def __init__(self, cache_backend: AsyncCacheStorage, elastic: AsyncElasticsearch):
+        self.cache_backend = cache_backend
         self.elastic = elastic
         self.index = "persons"
 
@@ -34,7 +34,7 @@ class PersonService(Paginator, RedisCache, AsyncElasticDataStorage):
 
 @lru_cache()
 def get_person_service(
-        cache: AsyncCacheStorage = Depends(get_redis),
+        cache_backend: AsyncCacheStorage = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> PersonService:
-    return PersonService(cache, elastic)
+    return PersonService(cache_backend, elastic)

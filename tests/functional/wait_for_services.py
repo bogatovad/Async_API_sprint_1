@@ -3,7 +3,7 @@ from datetime import time
 import backoff
 from elasticsearch import Elasticsearch
 from redis import Redis
-from settings import common_backoff_config, exception_redis, exception_es
+from settings import common_backoff_config, exception_es, exception_redis
 
 
 @backoff.on_exception(
