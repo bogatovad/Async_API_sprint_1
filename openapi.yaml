@@ -7,8 +7,7 @@ paths:
     get:
       tags:
         - films
-      summary: Search Films
-      description: Главная страница
+      summary: Поиск фильмов
       operationId: search_films_api_v1_films_search_get
       parameters:
         - description: Items amount on page
@@ -51,11 +50,10 @@ paths:
           in: query
       responses:
         '200':
-          description: Список фильмов на главной странице
+          description: Результат поиска по фильмам
           content:
             application/json:
               schema:
-                title: Response Search Films Api V1 Films Search Get
                 type: array
                 items:
                   $ref: '#/components/schemas/FilmResponse'
@@ -69,7 +67,7 @@ paths:
     get:
       tags:
         - films
-      summary: Film Details
+      summary: Подробности о фильме
       description: Получить информацию о фильме
       operationId: film_details_api_v1_films__film_id__get
       parameters:
@@ -96,7 +94,7 @@ paths:
     get:
       tags:
         - films
-      summary: List Films
+      summary: Список фильмов на главной странице
       description: Главная страница
       operationId: list_films_api_v1_films__get
       parameters:
@@ -144,7 +142,6 @@ paths:
           content:
             application/json:
               schema:
-                title: Response List Films Api V1 Films  Get
                 type: array
                 items:
                   $ref: '#/components/schemas/FilmResponse'
@@ -158,8 +155,8 @@ paths:
     get:
       tags:
         - films
-      summary: Films Alike
-      description: Похожие фильмы
+      summary: Похожие фильмы
+      description: Получить похожие фильмы
       operationId: films_alike_api_v1_films_alike__film_id__get
       parameters:
         - description: id фильма, для которого ищем похожие
@@ -190,7 +187,7 @@ paths:
     get:
       tags:
         - genres
-      summary: Genre Details
+      summary: Информация о жанре
       description: Получить информацию о жанре
       operationId: genre_details_api_v1_genres__genre_id__get
       parameters:
@@ -217,7 +214,7 @@ paths:
     get:
       tags:
         - genres
-      summary: List Genres
+      summary: Список жанров
       description: Список жанров
       operationId: list_genres_api_v1_genres__get
       responses:
@@ -234,7 +231,7 @@ paths:
     get:
       tags:
         - persons
-      summary: Search Persons
+      summary: Поиск по персоне
       description: Поиск по персоне
       operationId: search_persons_api_v1_persons_search_get
       parameters:
@@ -258,12 +255,12 @@ paths:
             default: 1
           name: page[number]
           in: query
-        - description: Search string for query.
+        - description: Поисковой запрос
           required: false
           schema:
             title: Query
             type: string
-            description: Search string for query.
+            description: Поисковой запрос
             default: ''
           name: query
           in: query
@@ -273,7 +270,7 @@ paths:
           content:
             application/json:
               schema:
-                title: Response Search Persons Api V1 Persons Search Get
+                title: Список персон
                 type: array
                 items:
                   $ref: '#/components/schemas/PersonDescriptionResponse'
@@ -320,17 +317,16 @@ paths:
       parameters:
         - required: true
           schema:
-            title: Person Id
+            title: Id персоны
             type: string
           name: person_id
           in: path
       responses:
         '200':
-          description: Фильмы по персоне.
+          description: Список фильмов с персоной
           content:
             application/json:
               schema:
-                title: Response List Film By Person Api V1 Persons  Person Id  Film Get
                 type: array
                 items:
                   $ref: '#/components/schemas/FilmResponse'
