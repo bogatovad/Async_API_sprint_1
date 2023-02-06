@@ -29,6 +29,12 @@ make up
 docker-compose down && docker-compose build && docker-compose up --exit-code-from tests
 ```
 
+Либо из корня 
+
+```
+make test
+```
+
 ## Линтинг и сортировка импортов
 Для запуска линтера python-проекта выполните следующую команду в корневой папке проекта:
 ```
