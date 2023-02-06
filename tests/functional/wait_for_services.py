@@ -1,9 +1,9 @@
 import backoff
+from elasticsearch import ConnectionError as ElasticConnectionError
 from elasticsearch import Elasticsearch
 from redis import Redis
 from redis.exceptions import ConnectionError as RedisConnectionError
 from settings import common_backoff_config, exception_es, exception_redis
-from elasticsearch import ConnectionError as ElasticConnectionError
 
 
 @backoff.on_exception(
