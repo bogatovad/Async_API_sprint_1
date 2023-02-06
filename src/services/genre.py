@@ -1,49 +1,31 @@
 from functools import lru_cache
 
-from aioredis import Redis
-from elasticsearch import AsyncElasticsearch, NotFoundError
+from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
 
 from db.elastic import get_elastic
 from db.redis import get_redis
-from models.genre import Genre
-from services.cache_backend import RedisCache, cache, AsyncCacheStorage
+from services.cache_backend import AsyncCacheStorage, cache
+from services.data_storage import DataStorage
 
 
-class GenreService(RedisCache):
-    def __init__(self, redis: Redis, elastic: AsyncElasticsearch):
-        self.redis = redis
-        self.elastic = elastic
-
-    @cache
-    async def get_by_id(self, *args, **kwargs):
-        return await self._get_genre_from_elastic(*args)
-
-    async def _get_genre_from_elastic(self, *args, **kwargs) -> Genre | None:
-        params, _ = args
-        try:
-            doc = await self.elastic.get('genres', params[0].get("genre_id"))
-        except NotFoundError:
-            return None
-        doc = doc['_source']
-        return Genre(**doc)
+class GenreService:
+    def __init__(self, cache_backend: AsyncCacheStorage, data_storage: DataStorage):
+        self.cache_backend = cache_backend
+        self.data_storage = data_storage
 
     @cache
-    async def get_list(self, *args, **kwargs):
-        return await self._get_genre_list_from_elastic()
+    async def get_data_by_id(self, *args, **kwargs):
+        return await self.data_storage.get_by_id(*args, **kwargs)
 
-    async def _get_genre_list_from_elastic(self) -> list[Genre] | None:
-        try:
-            docs = await self.elastic.search(index="genres", body={"query": {"match_all": {}}})
-        except NotFoundError:
-            return []
-        return [Genre(**genre['_source']) for genre in docs['hits']['hits']]
+    @cache
+    async def get_data_list(self, *args, **kwargs):
+        return await self.data_storage.get_list(*args, **kwargs)
 
 
 @lru_cache()
 def get_genre_service(
-        cache: AsyncCacheStorage = Depends(get_redis),
-        #cache: RedisCache = Depends(get_redis),
-        elastic: AsyncElasticsearch = Depends(get_elastic),
+        cache_backend: AsyncCacheStorage = Depends(get_redis),
+        data_storage: AsyncElasticsearch = Depends(get_elastic),
 ) -> GenreService:
-    return GenreService(cache, elastic)
+    return GenreService(cache_backend, data_storage)
