@@ -28,12 +28,14 @@ async def es_client():
     delete_data_from_elastic(url_elastic, ['movies', 'persons', 'genre'])
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 async def redis_client():
     redis_host: str = settings.redis_host
     redis_port: str = settings.redis_port
     redis = await aioredis.create_redis_pool((redis_host, redis_port), minsize=10, maxsize=20)
     yield redis
+    redis.close()
+    await redis.wait_closed()
 
 
 @pytest.fixture(scope='function')

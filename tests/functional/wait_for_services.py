@@ -1,5 +1,3 @@
-from datetime import time
-
 import backoff
 from elasticsearch import Elasticsearch
 from redis import Redis
@@ -14,7 +12,7 @@ def ping_redis():
     redis_client = Redis(
         host='redis',
         ssl=False,
-        socket_connect_timeout=5
+        socket_connect_timeout=100
     )
     if redis_client.ping():
         return

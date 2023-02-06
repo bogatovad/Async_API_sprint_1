@@ -4,7 +4,7 @@ from pydantic import BaseSettings, Field
 
 common_backoff_config = {
     'wait_gen': backoff.expo,
-    'max_tries': 3600,
+    'max_tries': 100,
     'raise_on_giveup': False
 }
 
