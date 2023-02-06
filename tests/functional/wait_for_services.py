@@ -1,7 +1,9 @@
 import backoff
 from elasticsearch import Elasticsearch
 from redis import Redis
+from redis.exceptions import ConnectionError as RedisConnectionError
 from settings import common_backoff_config, exception_es, exception_redis
+from elasticsearch import ConnectionError as ElasticConnectionError
 
 
 @backoff.on_exception(
@@ -14,8 +16,8 @@ def ping_redis():
         ssl=False,
         socket_connect_timeout=100
     )
-    if redis_client.ping():
-        return
+    if redis_client.ping() is False:
+        raise RedisConnectionError('Connect to redis is failed.')
 
 
 @backoff.on_exception(
@@ -28,7 +30,8 @@ def ping_es():
         validate_cert=False,
         use_ssl=False
     )
-    es_client.ping()
+    if es_client.ping() is False:
+        raise ElasticConnectionError('Connect to elasticsearch is failed.')
 
 
 if __name__ == '__main__':

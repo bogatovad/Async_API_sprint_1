@@ -1,6 +1,8 @@
 import backoff
-from elasticsearch import ConnectionError
 from pydantic import BaseSettings, Field
+from redis.exceptions import ConnectionError as RedisConnectionError
+from elasticsearch import ConnectionError as ElasticConnectionError
+
 
 common_backoff_config = {
     'wait_gen': backoff.expo,
@@ -9,11 +11,11 @@ common_backoff_config = {
 }
 
 exception_redis = {
-    'exception': Exception,
+    'exception': RedisConnectionError,
 }
 
 exception_es = {
-    'exception': ConnectionError,
+    'exception': ElasticConnectionError,
 }
 
 
