@@ -1,5 +1,5 @@
 import backoff
-from elasticsearch import ConnectionError
+from elasticsearch import ConnectionError, TransportError
 from pydantic import BaseSettings, Field
 
 common_backoff_config = {
@@ -13,7 +13,7 @@ exception_redis = {
 }
 
 exception_es = {
-    'exception': ConnectionError,
+    'exception': TransportError,
 }
 
 

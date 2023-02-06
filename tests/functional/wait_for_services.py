@@ -1,3 +1,4 @@
+from time import sleep
 from datetime import time
 
 import backoff
@@ -30,7 +31,9 @@ def ping_es():
         validate_cert=False,
         use_ssl=False
     )
-    es_client.ping()
+    if es_client.ping():
+        sleep(5)
+        return
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
+import backoff
 from abc import ABC, abstractmethod
 
-from elasticsearch import NotFoundError
+from elasticsearch import NotFoundError, ConnectionError
 
 from models.film import Film, FilmShort
 from models.genre import Genre
@@ -37,6 +38,7 @@ class AsyncElasticDataStorage(DataStorage):
     def __init__(self, es):
         self.elastic = es
 
+    @backoff.on_exception(backoff.expo, ConnectionError, max_time=10, factor=2)
     async def paginator(self, index: str, query_params: dict, page: int):
         doc = await self.elastic.search(
             index=index,
@@ -63,6 +65,7 @@ class AsyncElasticDataStorage(DataStorage):
 
         return data
 
+    @backoff.on_exception(backoff.expo, ConnectionError, max_time=10, factor=2)
     async def _get_data_by_id_movies(self, *args, **kwargs):
         """Поиск по id по фильмам."""
         params, = args
@@ -74,6 +77,7 @@ class AsyncElasticDataStorage(DataStorage):
             return None
         return Film(**doc['_source'])
 
+    @backoff.on_exception(backoff.expo, ConnectionError, max_time=10, factor=2)
     async def _get_actors(self, *args, **kwargs):
         params, = args
         person_id: str = params.get('person_id')
@@ -95,6 +99,7 @@ class AsyncElasticDataStorage(DataStorage):
         movies_actor = [movie['_source']['id'] for movie in docs_actors['hits']['hits']]
         return person, count_movies_actor, movies_actor
 
+    @backoff.on_exception(backoff.expo, ConnectionError, max_time=10, factor=2)
     async def _get_writers(self, *args, **kwargs):
         params, = args
         person_id: str = params.get('person_id')
@@ -128,6 +133,7 @@ class AsyncElasticDataStorage(DataStorage):
         movies_director = [movie['_source']['id'] for movie in docs_director['hits']['hits']]
         return count_movies_director, movies_director
 
+    @backoff.on_exception(backoff.expo, ConnectionError, max_time=10, factor=2)
     async def _get_data_by_id_persons(self, *args, **kwargs):
         """Поиск по id по персонажам."""
         person, count_movies_actor, movies_actor = await self._get_actors(*args)
@@ -148,6 +154,7 @@ class AsyncElasticDataStorage(DataStorage):
             film_ids=film_ids
         )
 
+    @backoff.on_exception(backoff.expo, ConnectionError, max_time=10, factor=2)
     async def _get_data_by_id_genres(self, *args, **kwargs):
         params, = args
         genre_id: str = params.get("genre_id")
@@ -158,6 +165,7 @@ class AsyncElasticDataStorage(DataStorage):
         doc = doc['_source']
         return Genre(**doc)
 
+    @backoff.on_exception(backoff.expo, ConnectionError, max_time=10, factor=2)
     async def get_by_id(self, *args, **kwargs):
         params, = args
         index = params.get('index')
@@ -168,6 +176,7 @@ class AsyncElasticDataStorage(DataStorage):
         }
         return await index_to_method[index](*args, **kwargs)
 
+    @backoff.on_exception(backoff.expo, ConnectionError, max_time=10, factor=2)
     async def _search_persons(self, *args, **kwargs):
         """Реализация поиска для персонажей."""
         params, = args
@@ -185,6 +194,7 @@ class AsyncElasticDataStorage(DataStorage):
             for person in loads_persons
         ]
 
+    @backoff.on_exception(backoff.expo, ConnectionError, max_time=10, factor=2)
     async def _search_movies(self, *args, **kwargs):
         """Реализация поиска для фильмов."""
         params, = args
@@ -193,6 +203,7 @@ class AsyncElasticDataStorage(DataStorage):
         loads_movies = await self.paginator(index, body, page)
         return [Film(**movie['_source']) for movie in loads_movies]
 
+    @backoff.on_exception(backoff.expo, ConnectionError, max_time=10, factor=2)
     async def search(self, *args, **kwargs):
         params, = args
         index = params.get('index')
@@ -202,6 +213,7 @@ class AsyncElasticDataStorage(DataStorage):
         }
         return await index_to_method[index](*args, **kwargs)
 
+    @backoff.on_exception(backoff.expo, ConnectionError, max_time=10, factor=2)
     async def _get_list_genres(self, *args, **kwargs):
         try:
             docs = await self.elastic.search(index="genres", body={"query": {"match_all": {}}})
@@ -209,6 +221,7 @@ class AsyncElasticDataStorage(DataStorage):
             return []
         return [Genre(**genre['_source']) for genre in docs['hits']['hits']]
 
+    @backoff.on_exception(backoff.expo, ConnectionError, max_time=10, factor=2)
     async def _get_list_movies(self, *args, **kwargs):
         params, = args
         index = params.get('index')
@@ -216,6 +229,7 @@ class AsyncElasticDataStorage(DataStorage):
         loads_films = await self.paginator(index, body, page)
         return [Film(**film['_source']) for film in loads_films]
 
+    @backoff.on_exception(backoff.expo, ConnectionError, max_time=10, factor=2)
     async def get_list(self, *args, **kwargs):
         """Метод реализует получение списка объектов."""
         params, = args
@@ -226,6 +240,7 @@ class AsyncElasticDataStorage(DataStorage):
         }
         return await index_to_method[index](*args, **kwargs)
 
+    @backoff.on_exception(backoff.expo, ConnectionError, max_time=10, factor=2)
     async def get_alike(self, *args, **kwargs):
         params, = args
         film = await self.get_by_id(dict(
@@ -246,6 +261,7 @@ class AsyncElasticDataStorage(DataStorage):
         films = await self.elastic.search(index="movies", body=query_params)
         return [Film(**film['_source']) for film in films['hits']['hits']]
 
+    @backoff.on_exception(backoff.expo, ConnectionError, max_time=10, factor=2)
     async def get_persons_film_by_id(self, *args, **kwargs):
         params, = args
         person_id: str = params.get('person_id')
