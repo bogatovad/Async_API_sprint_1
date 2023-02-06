@@ -34,19 +34,49 @@ class DataStorage(ABC):
 class AsyncElasticDataStorage(DataStorage):
     """Класс, реализующий доступ к эластику."""
 
+    def __init__(self, es):
+        self.elastic = es
+
+    async def paginator(self, index: str, query_params: dict, page: int):
+        doc = await self.elastic.search(
+            index=index,
+            body=query_params
+        )
+
+        data = doc['hits']['hits']
+
+        if not data:
+            return []
+
+        last_item = data[-1]
+        search_after = last_item['sort']
+        query_params['search_after'] = search_after
+
+        for item_page in range(1, int(page)):
+            docs = await self.elastic.search(index=index, body=query_params)
+            data = docs['hits']['hits']
+            if not data:
+                break
+            last_item = data[-1]
+            search_after = last_item['sort']
+            query_params['search_after'] = search_after
+
+        return data
+
     async def _get_data_by_id_movies(self, *args, **kwargs):
         """Поиск по id по фильмам."""
+        params, = args
+        index = params.get('index')
         try:
-            params, _ = args
-            film_id: str = params[0].get('film_id')
-            doc = await self.elastic.get(self.index, film_id)
+            film_id: str = params.get('film_id')
+            doc = await self.elastic.get(index, film_id)
         except NotFoundError:
             return None
         return Film(**doc['_source'])
 
     async def _get_actors(self, *args, **kwargs):
-        params, _ = args
-        person_id: str = params[0].get('person_id')
+        params, = args
+        person_id: str = params.get('person_id')
         person = await self.elastic.get("persons", person_id)
         body_actor = {
             "query": {
@@ -66,8 +96,8 @@ class AsyncElasticDataStorage(DataStorage):
         return person, count_movies_actor, movies_actor
 
     async def _get_writers(self, *args, **kwargs):
-        params, _ = args
-        person_id: str = params[0].get('person_id')
+        params, = args
+        person_id: str = params.get('person_id')
         body_writer = {
             "query": {
                 "nested": {
@@ -119,8 +149,8 @@ class AsyncElasticDataStorage(DataStorage):
         )
 
     async def _get_data_by_id_genres(self, *args, **kwargs):
-        params, _ = args
-        genre_id: str = params[0].get("genre_id")
+        params, = args
+        genre_id: str = params.get("genre_id")
         try:
             doc = await self.elastic.get('genres', genre_id)
         except NotFoundError:
@@ -129,23 +159,27 @@ class AsyncElasticDataStorage(DataStorage):
         return Genre(**doc)
 
     async def get_by_id(self, *args, **kwargs):
+        params, = args
+        index = params.get('index')
         index_to_method: dict = {
             'movies': self._get_data_by_id_movies,
             'persons': self._get_data_by_id_persons,
             'genres': self._get_data_by_id_genres,
         }
-        return await index_to_method[self.index](*args, **kwargs)
+        return await index_to_method[index](*args, **kwargs)
 
     async def _search_persons(self, *args, **kwargs):
         """Реализация поиска для персонажей."""
-        page, body = es_search_template(self.index, *args)
-        loads_persons = await self.paginator(self.index, body, page)
-        params, _ = args
+        params, = args
+        index = params.get('index')
+        page, body = es_search_template(index, *args)
+        loads_persons = await self.paginator(index, body, page)
         return [
-            await self.get_data_by_id(
+            await self.get_by_id(
                 dict(
                     person_id=person['_source']['id'],
-                    request=params[0].get('request')
+                    request=params.get('request'),
+                    index='persons'
                 )
             )
             for person in loads_persons
@@ -153,16 +187,20 @@ class AsyncElasticDataStorage(DataStorage):
 
     async def _search_movies(self, *args, **kwargs):
         """Реализация поиска для фильмов."""
-        page, body = es_search_template(self.index, *args)
-        loads_movies = await self.paginator(self.index, body, page)
+        params, = args
+        index = params.get('index')
+        page, body = es_search_template(index, *args)
+        loads_movies = await self.paginator(index, body, page)
         return [Film(**movie['_source']) for movie in loads_movies]
 
     async def search(self, *args, **kwargs):
+        params, = args
+        index = params.get('index')
         index_to_method: dict = {
             'movies': self._search_movies,
             'persons': self._search_persons,
         }
-        return await index_to_method[self.index](*args, **kwargs)
+        return await index_to_method[index](*args, **kwargs)
 
     async def _get_list_genres(self, *args, **kwargs):
         try:
@@ -172,23 +210,28 @@ class AsyncElasticDataStorage(DataStorage):
         return [Genre(**genre['_source']) for genre in docs['hits']['hits']]
 
     async def _get_list_movies(self, *args, **kwargs):
-        page, body = es_search_template(self.index, *args)
-        loads_films = await self.paginator(self.index, body, page)
+        params, = args
+        index = params.get('index')
+        page, body = es_search_template(index, *args)
+        loads_films = await self.paginator(index, body, page)
         return [Film(**film['_source']) for film in loads_films]
 
     async def get_list(self, *args, **kwargs):
         """Метод реализует получение списка объектов."""
+        params, = args
+        index = params.get('index')
         index_to_method: dict = {
             'movies': self._get_list_movies,
             'genres': self._get_list_genres,
         }
-        return await index_to_method[self.index](*args, **kwargs)
+        return await index_to_method[index](*args, **kwargs)
 
     async def get_alike(self, *args, **kwargs):
-        params, _ = args
+        params, = args
         film = await self.get_by_id(dict(
-            film_id=params[0].get('film_id'),
-            request=params[0].get('request')
+            film_id=params.get('film_id'),
+            request=params.get('request'),
+            index='movies'
         ))
         genres = film.genre
 
@@ -204,8 +247,8 @@ class AsyncElasticDataStorage(DataStorage):
         return [Film(**film['_source']) for film in films['hits']['hits']]
 
     async def get_persons_film_by_id(self, *args, **kwargs):
-        params, _ = args
-        person_id: str = params[0].get('person_id')
+        params, = args
+        person_id: str = params.get('person_id')
         body = {
             "query": {
                 "nested": {

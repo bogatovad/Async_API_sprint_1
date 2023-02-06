@@ -27,7 +27,8 @@ async def search_films(
         **common,
         query=query,
         sort=sort,
-        request=request
+        request=request,
+        index='movies'
     )
     films = await film_service.get_search(query_params)
     if not films:
@@ -48,7 +49,8 @@ async def film_details(
 ) -> FilmDescriptionResponse:
     query_params = dict(
         film_id=film_id,
-        request=request
+        request=request,
+        index='movies'
     )
     film = await film_service.get_data_by_id(query_params)
     if not film:
@@ -81,7 +83,8 @@ async def list_films(
     query_params = dict(
         **common,
         sort=sort,
-        request=request
+        request=request,
+        index='movies'
     )
     query_params['filter[genre]'] = filter_genre
     films = await film_service.get_all_films(query_params)
@@ -103,7 +106,8 @@ async def films_alike(
 ) -> list[FilmResponse]:
     query_params = dict(
         film_id=film_id,
-        request=request
+        request=request,
+        index='movies'
     )
     films = await film_service.get_films_alike(query_params)
     if not films:

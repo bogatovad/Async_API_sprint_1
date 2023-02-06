@@ -22,7 +22,8 @@ async def genre_details(
 ) -> GenreResponse:
     query_params = dict(
         genre_id=genre_id,
-        request=request
+        request=request,
+        index='genres'
     )
     genre = await genre_service.get_data_by_id(query_params)
     if not genre:
@@ -41,7 +42,8 @@ async def list_genres(
         genre_service: GenreService = Depends(get_genre_service)
 ) -> list[GenreResponse]:
     query_params = dict(
-        request=request
+        request=request,
+        index='genres'
     )
     genres = await genre_service.get_data_list(query_params)
     if not genres:

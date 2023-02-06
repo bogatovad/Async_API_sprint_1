@@ -2,9 +2,9 @@ from elasticsearch import AsyncElasticsearch
 
 from services.data_storage import AsyncElasticDataStorage
 
-es: AsyncElasticDataStorage | None
+es: AsyncElasticsearch | None
 
 
-async def get_elastic() -> AsyncElasticDataStorage:
+async def get_elastic() -> AsyncElasticsearch:
     """Функция для внедрения зависимостей."""
-    return es
+    return AsyncElasticDataStorage(es)

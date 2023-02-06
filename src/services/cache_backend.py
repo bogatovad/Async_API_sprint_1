@@ -42,7 +42,7 @@ def cache(get_data_from_elastic: Callable[..., ResponseType]) -> Callable[..., R
         if data is not None:
             return serializer.deserialize(data)
 
-        data = await get_data_from_elastic(self, args, kwargs)
+        data = await get_data_from_elastic(self, *args, **kwargs)
 
         # Сохранили данные в кэш.
         await self.cache_backend.set(key, serializer.serialize(data), expire=settings.film_cache_expire_in_seconds)
