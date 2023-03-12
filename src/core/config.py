@@ -19,9 +19,15 @@ class Settings(BaseSettings):
     fastapi_host: str = Field("0.0.0.0", env="FASTAPI_HOST")
     fastapi_port: int = Field(8000, env="FASTAPI_PORT")
 
+    auth_host: str = Field("127.0.0.1", env="AUTH_HOST")
+    auth_port: int = Field(80, env="AUTH_PORT")
+
     film_cache_expire_in_seconds: int = 60 * 5
     genre_cache_expire_in_seconds: int = 60 * 5
     person_cache_expire_in_seconds: int = 60 * 5
+
+    class Config:
+        env_file = "envs/.env"
 
 
 settings = Settings()

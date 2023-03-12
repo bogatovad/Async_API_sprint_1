@@ -16,6 +16,10 @@ services:
         - ./src:/fastapi
       expose:
         - 8000
+      ports:
+        - '8000:8000'
+      env_file:
+        - envs/.env
 
     redis:
       image: redis:7-alpine

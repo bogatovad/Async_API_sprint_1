@@ -7,6 +7,7 @@ from api.v1.common_paramaters import paginated_params
 from api.v1.models.film import FilmDescriptionResponse, FilmResponse
 from core.messages import ErrorMessage
 from services.film import FilmService, get_film_service
+from services.auth import special_permissions
 
 router = APIRouter()
 
@@ -42,11 +43,13 @@ async def search_films(
     description='Получить информацию о фильме',
     response_description='Подробная информация о фильме'
 )
+@special_permissions(['subscriber', 'admin'])
 async def film_details(
         request: Request,
         film_id: str,
         film_service: FilmService = Depends(get_film_service)
 ) -> FilmDescriptionResponse:
+    print(request)
     query_params = dict(
         film_id=film_id,
         request=request,
